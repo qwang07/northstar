@@ -7,14 +7,14 @@
   },
   "metadata": {
     "description": "Northstar：README 为唯一的、无时间的目标态真理；测试为其可执行投影；历史可追溯不可权威。",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "plugins": [
     {
       "name": "northstar",
       "source": "./plugins/northstar",
       "description": "自著教条层：architect / module / audit / implement 四技能。火力集中于设计+测试两瓶颈（坍缩为'在 README 声明完整意图'）；实现规模自适应，代码质量类工序留给工作流。四技能全自著、零外部 plugin 依赖，装上即独立运行。",
-      "version": "0.1.0"
+      "version": "0.1.1"
     }
   ]
 }
