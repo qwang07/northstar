@@ -4,3 +4,4 @@ node_modules/
 
 # 开发工具痕迹，非可分发物
 .serena/
+.claude/
