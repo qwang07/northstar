@@ -2,6 +2,8 @@
 
 [简体中文](README.md) | English
 
+> The Chinese [README.md](README.md) is the source of truth; this English version is a projection and may lag.
+
 A Claude Code plugin marketplace. **The README is the single, timeless source of target-state truth; tests are its executable projection; history is traceable but never authoritative.**
 
 The AI bottleneck has moved up from "implementation" to "design + test completeness." This framework concentrates all firepower on one thing: **declaring the requester's intent completely in the README** — the design and test bottlenecks collapse into this single act. Implementation is handed to a scale-adaptive execution form; code-quality chores are left to the workflow and stay out of the plugin. **All four skills are self-authored with zero external plugin dependencies (no superpowers or any other engine); it runs standalone once installed.**
