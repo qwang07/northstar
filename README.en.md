@@ -9,7 +9,7 @@ The AI bottleneck has moved up from "implementation" to "design + test completen
 ## Install
 
 ```bash
-/plugin marketplace add TODO-your-account/northstar
+/plugin marketplace add qwang07/northstar
 /plugin install northstar@northstar
 ```
 
@@ -103,5 +103,3 @@ So each skill self-authors a thin layer that nails only its own loop and invaria
 - **Skill cross-calling = semantic relevance + the platform Skill tool**, not hard paths. The loop (implement kicks back to module, audit kicks back to architect) just needs to name them in prose — no dependency declaration.
 - **Override priority = user instructions (CLAUDE.md) > plugin skill > default**: your CLAUDE.md naturally outranks any plugin skill; conflicts are resolved by mechanism.
 - **Version pinning** relies on the `gitCommitSha` recorded at install time (`~/.claude/plugins/installed_plugins.json`), not at the marketplace.json level.
-
-> All `TODO-` placeholders must be replaced with your real account/email before pushing to GitHub.
