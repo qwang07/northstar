@@ -64,7 +64,7 @@ Division of labor: in the architect/module phases, **the human** interrogates th
 | `architect` | arch · re-entrant | new: design topology / existing: distill + ask to adjust | project README (module list + dependency topology [each edge carries an interface contract] + boundary interfaces, **no internals**) | architecture structure test (modules exist as units + declared public interface visible, **pure structure · tool-agnostic**; does not verify the real dependency graph — edge semantics already covered by seam contracts) |
 | `module` | module · loop | design module-internal behavior contract + derive tests | module README (**internals only**) | business-intent behavior tests (**pure behavior**) |
 | `audit` | review · independent | **zero-context (hard requirement, must dispatch a subagent)** audit of design artifacts | pass / gap list (gates handoff) | audit: completeness · contract↔test consistency · boundary hygiene · internal consistency |
-| `implement` | implementation · scale-adaptive | turn red green (inline / subagent / workflow by scale) | implementation code | module-level exit gate self-issues the "contract conformance" check |
+| `implement` | implementation · scale-adaptive | complete micro-loop: verify-red→green→verify-green(regression)→refactor → contract gate → verify (inline / subagent / workflow by scale) | implementation code | module-level exit gate self-issues the "contract conformance" check + empirical verification |
 
 ## Design philosophy (core axioms)
 
