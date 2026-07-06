@@ -25,7 +25,7 @@ northstar/
 ├── plugins/northstar/
 │   ├── .claude-plugin/plugin.json      manifest
 │   └── skills/
-│       ├── brainstorming/SKILL.md      contract phase: dialogue into README (sole write entry, altitude is a parameter)
+│       ├── brainstorming/SKILL.md      contract phase: dialogue into README (sole write entry, clauses land at their authoritative layer)
 │       ├── write-test/SKILL.md         test phase: derive tests or a verification checklist from the README
 │       ├── audit/SKILL.md              independent review: zero-context audit (two checkpoints)
 │       ├── implement/SKILL.md          turn red green: means chosen by scale
@@ -45,10 +45,10 @@ northstar/
                                                  └──────────── close-out (project exit gate) ◀── all modules done
 ```
 
-- **The split axis is activity, not altitude**: contract dialogue / test writing / review / implementation each own a phase. Altitude (project-level / module-level) is a brainstorming parameter: project-level yields topology and boundaries, module-level yields the internal behavior contract.
-- **Altitude discipline**: if this round's scope > one module → the round stops at project-level topology decomposition (module list); sub-scopes iterate in later rounds through `brainstorming (module altitude) → write-test → audit → implement`.
+- **The split axis is activity; the round is defined by its goal**: contract dialogue / test writing / review / implementation each own a phase. Contract clauses land at their authoritative layer — project-level (topology and boundaries) / cross-cutting layer (constraints shared by multiple modules, existing on demand) / module-level (internal behavior); altitude is a landing result, not an entry parameter.
+- **Granularity valve**: if this round's goal requires expanding the internal contracts of more than one module → the round stops at decomposition (sub-goal list + project-level / cross-cutting clauses); each sub-goal becomes its own later round of `brainstorming → write-test → audit → implement`.
 - **Test-free branch**: pure one-off operations (migrations / backfills / one-shot scripts) get no derived tests; write-test instead produces a **mechanically decidable verification checklist**, audited alongside the README; implement's completion criterion is passing the checklist item by item.
-- **Two audit checkpoints**: after brainstorming finalizes the README (large scope: audit the contract first, saving derivation rework) + after write-test completes (README + tests / checklist reviewed together); small scopes may merge into one combined review.
+- **Two audit checkpoints**: after brainstorming finalizes the README (cross-module goals: audit the contract first, saving derivation rework) + after write-test completes (README + tests / checklist reviewed together); single-module goals may merge into one combined review.
 - **Close-out**: all modules done → return to brainstorming to close out — architecture structure tests all green + a re-run of the business-flow walkthrough = the project-level exit gate (loop terminal).
 - **Loop convergence valve**: any back-edge retriggering on the **same gap** up to a threshold (default 3) without converging → BLOCKED: stop auto-kickback, escalate to a human, attach that gap's kickback history (process-state, goes to git/Linear, never into the contract).
 
@@ -56,7 +56,7 @@ northstar/
 
 Advance one scope at a time; describe your intent in chat to trigger the matching skill:
 
-- **New project**: `brainstorming` (project altitude) designs the topology (module list + dependencies + interface contracts), gated by `audit`, then per module `brainstorming → write-test → audit → implement`; when all are done, `brainstorming` closes out.
+- **New project**: `brainstorming` (a cross-module goal) designs the topology (module list + dependencies + interface contracts), gated by `audit`, then per module `brainstorming → write-test → audit → implement`; when all are done, `brainstorming` closes out.
 - **Existing project**: `brainstorming` first distills the existing structure and asks whether to adjust; once the target state is set, proceed as above.
 - **Bug fix**: an unexplained red or production defect first enters `diagnose` for attribution, then routes by exit (implementation wrong → implement; contract gap → brainstorming; test wrong / weak assertion → write-test).
 - **Small change**: a pure-implementation small change goes straight to `implement` inline; a change that touches the contract goes back to `brainstorming` for the README and `write-test` for the tests first, then implement.
@@ -67,7 +67,7 @@ Division of labor: in the contract and test phases, **the human** interrogates t
 
 | skill | phase | responsibility | output |
 |---|---|---|---|
-| `brainstorming` | contract · sole README write entry | interrogate intent to completeness (one question at a time); distill existing code before asking to adjust; business-flow walkthrough before finalizing; close out when all modules are done | project-level README (module list + topology [each edge carries an interface contract] + boundary interfaces, **no internals**) or module-level README (responsibility & boundary / expected features / interface contract / edge cases & invariants, **internals only**) |
+| `brainstorming` | contract · sole README write entry | open with the goal, interrogate intent to completeness (one question at a time); distill existing code before asking to adjust; business-flow walkthrough before finalizing; close out when all modules are done | README clauses landed by goal: project-level (module list + topology [each edge carries an interface contract] + boundary interfaces, **no internals**) / cross-cutting layer (constraints shared by multiple modules, on demand) / module-level (responsibility & boundary / expected features / interface contract / edge cases & invariants, **internals only**) |
 | `write-test` | test · derivation | branch decision (needs lasting guarding → tests; one-off → verification checklist); test intent, not implementation; strong-assertion discipline | standalone test files (initially red: business-intent tests + structure tests [modules exist / interfaces visible / lasting invariants]) or a mechanically decidable checklist |
 | `audit` | review · independent | **zero-context (hard requirement, must dispatch a subagent)** review of design artifacts; two checkpoints; gaps routed back upstream | pass / gap list (gates handoff). Five checks: completeness · contract↔test consistency · boundary hygiene · internal consistency · **assertion strength** |
 | `implement` | implementation · scale-adaptive | full micro-loop: verify-red→green→verify-green(regression)→refactor → contract gate → verify (inline / subagent / workflow by scale); test-free branch completes by passing the checklist item by item | implementation code |
@@ -77,11 +77,11 @@ Division of labor: in the contract and test phases, **the human** interrogates t
 ## Design philosophy (core axioms)
 
 - **Two bottlenecks collapse into one**: AI implementation is production-ready; the real problems are ① system design ② test completeness, both equivalent to "declaring intent completely in the README." All skill firepower goes here.
-- **Split by activity, altitude is a parameter**: contract dialogue, test writing, review, and implementation are four activities, each owning a phase; project-level / module-level is merely brainstorming's input parameter. One activity is never split into two skills by altitude — that breeds the mirror tax.
+- **Split by activity, the goal defines the round**: contract dialogue, test writing, review, and implementation are four activities, each owning a phase; the round is defined by its goal (what to achieve, what counts as achieved), and project-level / cross-cutting / module-level are merely the layers where clauses land. One activity is never split into two skills by altitude — that breeds the mirror tax.
 - **Sole README write entry**: only brainstorming may write READMEs; audit / write-test / implement / diagnose treat them as read-only and kick gaps back. Companion rule: one authoritative statement + pointers, no restating across READMEs.
 - **Temporal-semantics layering**: target-state (README + tests, bounded, sole truth) vs process-state (git log / Linear / memory tools, monotonically growing, traceable but not authoritative).
 - **Target-state splits into two properties**: timeless (describes the current should-be state, not a changelog — **kept**) ≠ history-less (destroying decision rationale — **rejected**). Rationale is process-state, routed out rather than deleted; a load-bearing constraint keeps a **one-token marker** (`[承重·勿删]`) in the hot doc, while the rationale itself goes to the workflow (memory/issues).
-- **Two levels, zero overlap**: the project-level README owns topology (module set + dependency edges, pure structure); the module-level README owns behavior (given input, output matches intent). The dividing line is the module boundary itself. The same information at both levels = a seed of drift.
+- **Zero overlap across layers**: the README tree is layered by the project's real structure — the project level owns topology (module set + dependency edges, pure structure), cross-cutting layers own constraints shared by multiple modules (existing on demand), the module level owns behavior (given input, output matches intent); every clause is declared once at its authoritative layer, lower layers receive it by pointer. The same information at two layers = a seed of drift.
 - **Seam closure**: every topology edge carries an interface contract I; I is declared once at the project level, and the upstream output test and downstream input test both target the same I → semantic compatibility is locked from both sides, **no separate integration layer needed**. Structure tests verify only "modules exist + interfaces visible + lasting invariants," **not the real dependency graph and not runtime wiring**; the latter is the integration layer — YAGNI by default, done only when the README explicitly declares system-level intent as integration behavior tests.
 - **Business-flow walkthrough**: each phase owns one segment; nobody naturally owns walking a business flow end to end — broken links (swallowed-error loops, signals with no consumer, dangling states) are invisible to any single phase. So brainstorming, at finalize and close-out, treats the README contract web as a state machine and walks every flow's forward, reverse, and exception paths looking for the receiving contract at each step.
 - **Strong-assertion discipline**: a test whose assertion is vacuous has zero discriminating power — worse than no test (it fakes coverage). write-test bans vacuous assertions / status-code-only checks / loose enum matching / unlocked precision; audit's fifth check targets assertion strength.
