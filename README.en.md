@@ -116,6 +116,8 @@ Distribution   Claude Code: .claude-plugin/ marketplace
                Codex: in-repo plugin manifest (per the platform convention .codex-plugin/plugin.json); agents ship with the repo (not in the plugin) + one-time install guide
 ```
 
+Binding layer = agent definitions + a **platform execution note** (one per platform: the item-by-item delivery declaration for the capability table, the platform-specific execution details extracted from the dogma, and platform prerequisites all live here; dogma text references it by pointer, location is implementation freedom).
+
 **I-platform-capability table** (the dogma↔binding interface contract): dogma text expresses platform actions only in abstract verbs; each binding layer declares, item by item, how its platform delivers —
 1. Dispatch a zero-context subagent (the two cuts: audit / code-review)
 2. Dispatch a module-level executor (implement) and an attributor (diagnose)
