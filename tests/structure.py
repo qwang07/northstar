@@ -140,7 +140,9 @@ def platform_notes(platform_word):
         if ".git" in p.parts or p.name in ("README.md", "README.en.md"):
             continue
         t = p.read_text(encoding="utf-8")
-        if "I-平台能力表" in t and platform_word in t and all(a in t for a in AGENTS):
+        # 平台归属以标题行判定——正文提及他平台（如交叉指针）不得冒充他平台的说明
+        title = t.lstrip().splitlines()[0] if t.strip() else ""
+        if "I-平台能力表" in t and platform_word in title and all(a in t for a in AGENTS):
             found.append(p)
     return found
 
