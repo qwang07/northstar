@@ -6,7 +6,7 @@
 
 A Claude Code plugin marketplace. **The README is the single, timeless source of target-state truth; tests are its executable projection; history is traceable but never authoritative.**
 
-The AI bottleneck has moved up from "implementation" to "design + test completeness." This framework concentrates all firepower on one thing: **declaring the requester's intent completely in the README** — the design and test bottlenecks collapse into this single act. The loop is split by **activity**: contract dialogue (brainstorming) → derive guards (write-test) → independent review (audit) → turn red green (implement); defects enter through the diagnose attribution gate, and code-review delivers the closing quality cut. **All six skills and five execution subagents are self-authored with zero external plugin dependencies (no superpowers or any other engine); it runs standalone once installed.**
+The AI bottleneck has moved up from "implementation" to "design + test completeness." This framework concentrates all firepower on one thing: **declaring the requester's intent completely in the README** — the design and test bottlenecks collapse into this single act. The loop is split by **activity**: contract dialogue (brainstorming) → derive guards (write-test) → independent review (audit) → turn red green (implement); defects enter through the diagnose attribution gate, and code-review delivers the closing quality cut. **All six skills and six execution subagents are self-authored with zero external plugin dependencies (no superpowers or any other engine); it runs standalone once installed.**
 
 ## Install
 
@@ -15,29 +15,34 @@ The AI bottleneck has moved up from "implementation" to "design + test completen
 /plugin install northstar@northstar
 ```
 
-After install, the six skills appear namespaced: `northstar:brainstorming` / `:write-test` / `:audit` / `:implement` / `:diagnose` / `:code-review`; five execution subagents register with the plugin: `ns-scout` / `ns-diagnostician` / `ns-auditor` / `ns-implementer` / `ns-simplifier`.
+After install, the six skills appear namespaced: `northstar:brainstorming` / `:write-test` / `:audit` / `:implement` / `:diagnose` / `:code-review`; six execution subagents register with the plugin: `ns-scout` / `ns-diagnostician` / `ns-auditor` / `ns-implementer` / `ns-simplifier` / `ns-reviewer`.
+
+Codex CLI side: skills install via the in-repo plugin manifest; agents are in-repo TOML files, copied once into the user's agents directory per the install guide (which must state the pinned models — see the Cross-platform topology section).
 
 ## Structure
 
 ```
 northstar/
-├── .claude-plugin/marketplace.json     catalog
+├── .claude-plugin/marketplace.json     Claude Code catalog
 ├── plugins/northstar/
 │   ├── .claude-plugin/plugin.json      manifest
 │   ├── skills/
-│       ├── brainstorming/SKILL.md      contract phase: dialogue into README (sole write entry, clauses land at their authoritative layer)
-│       ├── write-test/SKILL.md         test phase: derive tests or a verification checklist from the README
-│       ├── audit/SKILL.md              independent review: zero-context audit (two checkpoints)
-│       ├── implement/SKILL.md          turn red green: means chosen by scale
-│       ├── diagnose/SKILL.md           defect entry: attribution before any fix, exits routed back into the loop
-│       └── code-review/SKILL.md        closing quality cut: zero-context code-quality review
+│   │   ├── brainstorming/SKILL.md      contract phase: dialogue into README (sole write entry, clauses land at their authoritative layer)
+│   │   ├── write-test/SKILL.md         test phase: derive tests or a verification checklist from the README
+│   │   ├── audit/SKILL.md              independent review: zero-context audit (two checkpoints)
+│   │   ├── implement/SKILL.md          turn red green: means chosen by scale
+│   │   ├── diagnose/SKILL.md           defect entry: attribution before any fix, exits routed back into the loop
+│   │   └── code-review/SKILL.md        closing quality cut: zero-context code-quality review
 │   └── agents/
 │       ├── ns-scout.md                 read-only retrieval (haiku)
 │       ├── ns-diagnostician.md         diagnose-phase attributor (opus)
 │       ├── ns-auditor.md               audit-phase zero-context reviewer (opus)
 │       ├── ns-implementer.md           implement-phase module executor (sonnet)
-│       └── ns-simplifier.md            wrap-up simplification pass (opus)
-└── README.md
+│       ├── ns-simplifier.md            wrap-up simplification pass (opus)
+│       └── ns-reviewer.md              code-review-phase zero-context reviewer (opus)
+├── <Codex distribution & binding>      in-repo plugin manifest + agents TOML + install guide (file layout is implementation freedom)
+├── README.md
+└── README.en.md
 ```
 
 ## Rhythm
@@ -97,16 +102,43 @@ Division of labor: in the contract and test phases, **the human** interrogates t
 - **Anti-cheat gate (implement invariants)**: tests and review findings are read-only to the execution loop — no tampering, no pre-judging, no softening; a wrong test is kicked back upstream, never silently patched in the loop.
 - **Attribution before fixing**: no defect gets fixed without attribution; "it looks like X, so change X" is what diagnose exists to eliminate. Fixes always happen in implement; diagnose only produces handoff artifacts.
 
+## Cross-platform topology: single-source dogma, dual-written bindings
+
+northstar ships for two platforms, Claude Code and Codex CLI. Three layers, connected by interface contracts:
+
+```
+Dogma layer    plugins/northstar/skills/ six SKILL.md — single source, platform-agnostic
+   ▲ via the I-platform-capability table
+Binding layer  Claude Code: plugins/northstar/agents/*.md (frontmatter pins opus/sonnet/haiku)
+               Codex: agents TOML (pins concrete models + reasoning-effort tiers)
+   ▲
+Distribution   Claude Code: .claude-plugin/ marketplace
+               Codex: in-repo plugin manifest; agents ship with the repo (not in the plugin) + one-time install guide
+```
+
+**I-platform-capability table** (the dogma↔binding interface contract): dogma text expresses platform actions only in abstract verbs; each binding layer declares, item by item, how its platform delivers —
+1. Dispatch a zero-context subagent (the two cuts: audit / code-review)
+2. Dispatch a module-level executor (implement) and an attributor (diagnose)
+3. Read-only retrieval
+4. Wrap-up simplification pass
+5. Model / reasoning-effort tiering: judgment high (review / attribution / simplification), execution medium, retrieval low
+
+**Cross-cutting constraints (shared by both bindings)**:
+- Dogma text must contain no platform-specific names (tool names / config fields / invocation syntax) — enforced as a mechanically assertable lasting invariant
+- Each binding delivers every item of the capability table; any undeliverable item = that step explicitly unavailable on that platform, silent degradation forbidden (the zero-context item defers to the BLOCKED axiom in the next section, pointer not restatement)
+- Loop orchestration is always "main session → one layer of subagents"; no skill may require a subagent to dispatch further subagents
+- The Codex binding pins concrete models: the install guide must state the required models and note that users may change models / tiers in their local copies; the release process includes "verify pinned models are still valid" `[load-bearing, keep]`
+
 ## Plugin boundary: dogma + execution bindings (two zero-context cuts share one platform primitive)
 
-The plugin = six skills (dogma, tool-agnostic) + five subagents (execution bindings: per-phase executors and model tiering, shipped with the plugin — ending their life outside version control). Platform dependency: `audit` and `code-review` must dispatch a **zero-context subagent** (a native capability, but still a dependency — the in-session agent remembers the design conversation and can't be truly zero-context); when the environment can't dispatch one, that step is not executable — BLOCKED to a human, never downgraded to self-review. Everything else below stays **out of the plugin** and is the user's personal global CLAUDE.md workflow config:
+The plugin = six skills (dogma, tool-agnostic) + six subagents (execution bindings: per-phase executors and model tiering, shipped with the plugin — ending their life outside version control). Platform dependency: `audit` and `code-review` must dispatch a **zero-context subagent** (a native capability, but still a dependency — the in-session agent remembers the design conversation and can't be truly zero-context); when the environment can't dispatch one, that step is not executable — BLOCKED to a human, never downgraded to self-review. Everything else below stays **out of the plugin** and is the user's personal global CLAUDE.md workflow config:
 
 - **Process-state routing** (where rationale / todos / history go): bind memory tools / Linear / git. Skills only declare "process-state stays out of the contract, routed out," not where to.
 - **Contract-conformance review** (does the implementation exactly == the contract) is the opposite — it's framework dogma, self-issued by `implement`'s exit gate, not outsourced.
 
 ## Independence: self-contained, no external engine
 
-All six skills and five subagents are self-authored, **depending on / reusing / pinning no external plugin** (including superpowers and other official engines; the ns-simplifier pass was digested from the official code-simplifier and re-authored, with a source line kept in its definition file). northstar runs standalone once installed.
+All six skills and six subagents are self-authored, **depending on / reusing / pinning no external plugin** (including superpowers and other official engines; the ns-simplifier pass was digested from the official code-simplifier and re-authored, with a source line kept in its definition file). northstar runs standalone once installed.
 
 **Why no external engine**: borrowing an off-the-shelf TDD / review engine was considered and dropped after a fit assessment — "don't reinvent the wheel" holds only when it's "redundant and unnecessary," and northstar needs things an external engine can't give:
 
