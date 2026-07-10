@@ -37,7 +37,7 @@ FORBIDDEN = [
     r"\bopus\b", r"\bsonnet\b", r"\bhaiku\b", r"\bgpt-\d", r"model_reasoning_effort",
     r"Claude Code", r"\bCodex\b", r"\.claude\b", r"\.codex\b",
     r"CLAUDE\.md", r"AGENTS\.md", r"marketplace", r"plugin\.json",
-    r"\bworkflow\b", r"\binline\b",
+    r"\bworkflow\b", r"\binline\b", r"\bteam\b",
 ]
 
 failures = []
