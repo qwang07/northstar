@@ -40,7 +40,7 @@ northstar/
 │       ├── ns-implementer.md           implement-phase module executor (sonnet)
 │       ├── ns-simplifier.md            wrap-up simplification pass (opus)
 │       └── ns-reviewer.md              code-review-phase zero-context reviewer (opus)
-├── <Codex distribution & binding>      in-repo plugin manifest + agents TOML + install guide (file layout is implementation freedom)
+├── <Codex distribution & binding>      in-repo plugin manifest + agents TOML + install guide (manifest path & TOML schema follow Codex platform conventions; directory layout is implementation freedom)
 ├── README.md
 └── README.en.md
 ```
@@ -110,10 +110,10 @@ northstar ships for two platforms, Claude Code and Codex CLI. Three layers, conn
 Dogma layer    plugins/northstar/skills/ six SKILL.md — single source, platform-agnostic
    ▲ via the I-platform-capability table
 Binding layer  Claude Code: plugins/northstar/agents/*.md (frontmatter pins opus/sonnet/haiku)
-               Codex: agents TOML (pins concrete models + reasoning-effort tiers)
+               Codex: agents TOML (per the platform agent schema, pinning concrete models + reasoning-effort tiers)
    ▲
 Distribution   Claude Code: .claude-plugin/ marketplace
-               Codex: in-repo plugin manifest; agents ship with the repo (not in the plugin) + one-time install guide
+               Codex: in-repo plugin manifest (per the platform convention .codex-plugin/plugin.json); agents ship with the repo (not in the plugin) + one-time install guide
 ```
 
 **I-platform-capability table** (the dogma↔binding interface contract): dogma text expresses platform actions only in abstract verbs; each binding layer declares, item by item, how its platform delivers —
