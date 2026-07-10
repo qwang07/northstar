@@ -37,6 +37,7 @@ FORBIDDEN = [
     r"\bopus\b", r"\bsonnet\b", r"\bhaiku\b", r"\bgpt-\d", r"model_reasoning_effort",
     r"Claude Code", r"\bCodex\b", r"\.claude\b", r"\.codex\b",
     r"CLAUDE\.md", r"AGENTS\.md", r"marketplace", r"plugin\.json",
+    r"\bworkflow\b", r"\binline\b",
 ]
 
 failures = []
@@ -129,6 +130,30 @@ for s in sorted(SKILLS):
     text = p.read_text(encoding="utf-8") if p.exists() else ""
     hits = sorted({pat for pat in FORBIDDEN if re.search(pat, text)})
     check(f"T7 {s} 正文无平台专属名词", not hits, f"命中禁词 {hits}")
+
+# T10 平台执行说明：每平台一份（绑定层扩义条款），逐项兑现不接受空壳——
+# 发现式：非 README 的 Markdown，含"I-平台能力表"且含平台名；强断言：兑现声明须
+# 引用全部六个 agent（能力表 1-4 项的执行者 + 第 5 项分级的载体），缺一即空壳。
+def platform_notes(platform_word):
+    found = []
+    for p in ROOT.rglob("*.md"):
+        if ".git" in p.parts or p.name in ("README.md", "README.en.md"):
+            continue
+        t = p.read_text(encoding="utf-8")
+        if "I-平台能力表" in t and platform_word in t and all(a in t for a in AGENTS):
+            found.append(p)
+    return found
+
+claude_notes = platform_notes("Claude")
+check("T10 Claude 平台执行说明存在且逐项兑现", len(claude_notes) >= 1,
+      "未发现含 I-平台能力表 + 全部六 agent 兑现声明的 Claude 侧说明")
+check("T10 Codex 平台执行说明存在且逐项兑现", len(platform_notes("Codex")) >= 1,
+      "未发现含 I-平台能力表 + 全部六 agent 兑现声明的 Codex 侧说明")
+
+# T11 教条指针：抽离了平台执行细节的教条正文须以指针引用平台执行说明，且指针有真实落点
+impl_text = (SKILLS_DIR / "implement/SKILL.md").read_text(encoding="utf-8")
+check("T11 implement 指针指向真实平台执行说明", "平台执行说明" in impl_text and len(claude_notes) >= 1,
+      "缺指针字样，或指针无落点（Claude 侧说明不存在）")
 
 # T8 引用完整性：双语 README 花名册 == agents/ 文件集（持续不变量·跨文档引用完整性）
 for readme in ["README.md", "README.en.md"]:
