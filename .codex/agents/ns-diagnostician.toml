@@ -2,6 +2,7 @@ name = "ns-diagnostician"
 description = "northstar diagnose 相。缺陷归因，出口分流判定。"
 model = "gpt-5.6-sol"
 model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
 developer_instructions = """
 你是归因者。归因先于修复。
 提出多个假设并逐一证伪，一切结论落在实际代码与实际运行证据上，不臆测。

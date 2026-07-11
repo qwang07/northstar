@@ -27,7 +27,7 @@ northstar 教条正文只用抽象动作；本文声明 Codex CLI 平台对 **I-
 
 - 会话内直改 → 主会话直接编辑
 - 派发单执行者 → 显式委派提示 spawn 一个 agent（spawn_agent / wait_agent / close_agent），执行完毕即 close
-- 多执行者并行编排 → 一次委派提示 spawn 多个 agent 并行（并发受 `agents.max_threads` 限，默认 6）；以 `git worktree` 隔离防冲突（平台无内建隔离原语，须在委派前手工建 worktree 并在委派中指定工作目录）
+- 多执行者并行编排 → 一次委派提示 spawn 多个 agent 并行（并发上限在 `~/.codex/config.toml` 的 `[agents]` 段 `max_threads` 配置，默认 6）；以 `git worktree` 隔离防冲突——平台无内建隔离原语，委派前逐任务手工建 worktree（如 `git worktree add ../task-a -b task-a`）并在委派中指定其为工作目录，任务收编后 `git worktree remove` 清理
 
 ## 派发细则（教条抽离承接）
 

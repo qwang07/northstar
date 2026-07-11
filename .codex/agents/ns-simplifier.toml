@@ -16,4 +16,6 @@ developer_instructions = """
 测试与 README 只读。发现疑似 bug 或契约缺口，只报告不动手——那是 code-review 与回路的事。
 
 回报：精简点清单，每点一句话；无可精简则直说。保持简短。
+
+来源：消化自官方 code-simplifier agent（claude-plugins-official，Apache-2.0）；去其硬编码的 JS/React 项目规范，改锚项目约定与 northstar 只读纪律。
 """
