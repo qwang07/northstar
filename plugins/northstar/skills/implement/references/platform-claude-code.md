@@ -1,6 +1,6 @@
 # Claude Code 平台执行说明（绑定层）
 
-northstar 教条正文只用抽象动作；本文声明 Claude Code 平台对 **I-平台能力表** 的逐项兑现，并承接教条抽离的平台执行细节。Codex 平台的对应说明随其绑定层轮次落地（`platform-codex.md`，待建）。
+northstar 教条正文只用抽象动作；本文声明 Claude Code 平台对 **I-平台能力表** 的逐项兑现，并承接教条抽离的平台执行细节。Codex 平台见同目录 `platform-codex.md`。
 
 ## I-平台能力表逐项兑现
 
