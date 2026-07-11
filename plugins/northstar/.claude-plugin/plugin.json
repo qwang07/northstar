@@ -1,7 +1,7 @@
 {
   "name": "northstar",
   "description": "Northstar 教条层（brainstorming/write-test/audit/implement/diagnose/code-review）。README=唯一的、无时间的目标态真理；测试=其可执行投影；历史可追溯不可权威。",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "author": { "name": "qwang07" },
   "homepage": "https://github.com/qwang07/northstar",
   "repository": "https://github.com/qwang07/northstar",
