@@ -21,7 +21,7 @@ northstar 教条正文只用抽象动作；本文声明 Codex CLI 平台对 **I-
 | 2 | 执行者与归因者 | implement 整模块 → `ns-implementer`；diagnose → `ns-diagnostician` |
 | 3 | 只读检索 | `ns-scout` |
 | 4 | 收尾精简 | `ns-simplifier` |
-| 5 | 模型 / 档位分级 | 钉死于各 agent TOML：判断类 `gpt-5.5` + high（ns-auditor / ns-reviewer / ns-diagnostician / ns-simplifier）、执行类 `gpt-5.6-terra` + medium（ns-implementer）、检索类 `gpt-5.4-mini` + low（ns-scout）；所钉集与账号型适配见安装指引 |
+| 5 | 模型 / 档位分级 | 钉死于各 agent TOML：判断类 `gpt-5.6-sol` + high（ns-auditor / ns-reviewer / ns-diagnostician / ns-simplifier）、执行类 `gpt-5.6-terra` + medium（ns-implementer）、检索类 `gpt-5.6-luna` + low（ns-scout）；订阅档位适配与降档表见安装指引 |
 
 ## 执行三形态的平台兑现（implement 相）
 
@@ -33,4 +33,4 @@ northstar 教条正文只用抽象动作；本文声明 Codex CLI 平台对 **I-
 
 - **深度约束**：`agents.max_depth` 默认 1——子代理不能再派子代理；northstar 回路编排恒为"主会话 → 一层子代理"，天然兼容，勿调高该值。
 - **模型不覆写**：档位已钉死于各 agent TOML；委派时不要求平台改用其他型号。
-- **型号可用性**：所钉型号（gpt-5.5 / gpt-5.6-terra / gpt-5.4-mini，以安装指引型号表为准）随 OpenAI 谱系迭代，用户可在本地 `~/.codex/agents/` 副本自行改型号 / 降档；发版流程含"校验所钉型号仍有效"。
+- **型号可用性**：所钉型号（gpt-5.6-sol / gpt-5.6-terra / gpt-5.6-luna，以安装指引型号表为准）随 OpenAI 谱系与订阅档位而变，用户可在本地 `~/.codex/agents/` 副本自行改型号 / 降档；发版流程含"校验所钉型号仍有效"。
