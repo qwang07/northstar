@@ -33,4 +33,5 @@ northstar 教条正文只用抽象动作；本文声明 Codex CLI 平台对 **I-
 
 - **深度约束**：`agents.max_depth` 默认 1——子代理不能再派子代理；northstar 回路编排恒为"主会话 → 一层子代理"，天然兼容，勿调高该值。
 - **模型不覆写**：档位已钉死于各 agent TOML；委派时不要求平台改用其他型号。
+- **内循环 diff 核对**：主会话亲自读 diff，或轻量委派 `ns-reviewer`（同 code-review 评审者）提前把关——收尾 code-review 刀不因此免除。
 - **型号可用性**：所钉型号（gpt-5.6-sol / gpt-5.6-terra / gpt-5.6-luna，以安装指引型号表为准）随 OpenAI 谱系与订阅档位而变，用户可在本地 `~/.codex/agents/` 副本自行改型号 / 降档；发版流程含"校验所钉型号仍有效"。

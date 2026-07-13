@@ -22,4 +22,5 @@ northstar 教条正文只用抽象动作；本文声明 Claude Code 平台对 **
 
 - **模型不覆写**：派发 ns-* 时不显式传 model 参数——档位已由 frontmatter 钉死；禁设 `CLAUDE_CODE_SUBAGENT_MODEL` 环境变量（其优先级高于 frontmatter，会静默架空整张路由表）。
 - **未钉档的临时派发**（如天真代理压测）沿用同一分级原则选档：判断 / 评审类最高档、执行类中档、机械转录与检索类最低档——不显式指定会静默继承主会话（最贵）模型。
+- **内循环 diff 核对**：主会话亲自读 diff，或轻量派 `ns-reviewer`（同 code-review 评审者）提前把关——收尾 code-review 刀不因此免除。
 - **平台前置**：无；northstar 插件装上即含六 agent。
