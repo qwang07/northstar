@@ -28,12 +28,14 @@ cp .codex/agents/*.toml ~/.codex/agents/
 
 | agent | 型号 | effort |
 |---|---|---|
-| ns-auditor | gpt-5.6-sol | high |
-| ns-reviewer | gpt-5.6-sol | high |
-| ns-diagnostician | gpt-5.6-sol | high |
-| ns-simplifier | gpt-5.6-sol | high |
+| ns-auditor | gpt-5.5 | high |
+| ns-reviewer | gpt-5.5 | high |
+| ns-diagnostician | gpt-5.5 | high |
+| ns-simplifier | gpt-5.5 | high |
 | ns-implementer | gpt-5.6-terra | medium |
-| ns-scout | gpt-5.6-luna | low |
+| ns-scout | gpt-5.4-mini | low |
+
+所钉集以 ChatGPT 账号实测可用为准（2026-07 实测：gpt-5.6-sol / gpt-5.6-luna 对 ChatGPT 账号不可用）。API-key / 企业用户可把判断类自升 gpt-5.6-sol、检索类改 gpt-5.6-luna。
 
 所钉型号随 OpenAI 谱系迭代；若你的订阅档位无某型号权限，或想控制成本，可直接编辑 `~/.codex/agents/` 里的副本改型号 / 降 effort——分级原则（判断高 / 执行中 / 检索低）保持即可。注意：降档会相应降低该环节（评审 / 归因 / 精简）的判别力，取舍自担。
 

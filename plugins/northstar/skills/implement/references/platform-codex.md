@@ -21,7 +21,7 @@ northstar 教条正文只用抽象动作；本文声明 Codex CLI 平台对 **I-
 | 2 | 执行者与归因者 | implement 整模块 → `ns-implementer`；diagnose → `ns-diagnostician` |
 | 3 | 只读检索 | `ns-scout` |
 | 4 | 收尾精简 | `ns-simplifier` |
-| 5 | 模型 / 档位分级 | 钉死于各 agent TOML：判断类 `gpt-5.6-sol` + high（ns-auditor / ns-reviewer / ns-diagnostician / ns-simplifier）、执行类 `gpt-5.6-terra` + medium（ns-implementer）、检索类 `gpt-5.6-luna` + low（ns-scout） |
+| 5 | 模型 / 档位分级 | 钉死于各 agent TOML：判断类 `gpt-5.5` + high（ns-auditor / ns-reviewer / ns-diagnostician / ns-simplifier）、执行类 `gpt-5.6-terra` + medium（ns-implementer）、检索类 `gpt-5.4-mini` + low（ns-scout）；所钉集与账号型适配见安装指引 |
 
 ## 执行三形态的平台兑现（implement 相）
 

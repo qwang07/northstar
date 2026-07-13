@@ -15,7 +15,7 @@ The AI bottleneck has moved up from "implementation" to "design + test completen
 /plugin install northstar@northstar
 ```
 
-After install, the six skills appear namespaced: `northstar:brainstorming` / `:write-test` / `:audit` / `:implement` / `:diagnose` / `:code-review`; six execution subagents register with the plugin: `ns-scout` / `ns-diagnostician` / `ns-auditor` / `ns-implementer` / `ns-simplifier` / `ns-reviewer`.
+After install, the six skills appear namespaced: `northstar:brainstorming` / `:write-test` / `:audit` / `:implement` / `:diagnose` / `:code-review`; on the Claude Code side, six execution subagents register with the plugin: `ns-scout` / `ns-diagnostician` / `ns-auditor` / `ns-implementer` / `ns-simplifier` / `ns-reviewer`.
 
 Codex CLI side: skills install via the in-repo plugin manifest; agents are in-repo TOML files, copied once into the user's agents directory per the install guide (which must state the pinned models — see the Cross-platform topology section).
 
@@ -133,7 +133,7 @@ Binding layer = agent definitions + a **platform execution note** (one per platf
 
 ## Plugin boundary: dogma + execution bindings (two zero-context cuts share one platform primitive)
 
-The plugin = six skills (dogma, tool-agnostic) + six subagents (execution bindings: per-phase executors and model tiering, shipped with the plugin — ending their life outside version control). Platform dependency: `audit` and `code-review` must dispatch a **zero-context subagent** (a native capability, but still a dependency — the in-session agent remembers the design conversation and can't be truly zero-context); when the environment can't dispatch one, that step is not executable — BLOCKED to a human, never downgraded to self-review. Everything else below stays **out of the plugin** and is the user's personal global CLAUDE.md workflow config:
+The plugin = six skills (dogma, tool-agnostic) + six subagents (execution bindings: per-phase executors and model tiering; shipped with the plugin on the Claude Code side, and as the same definitions in TOML shipped with the repo on the Codex side — see the Cross-platform topology section; both under version control, ending their life outside it). Platform dependency: `audit` and `code-review` must dispatch a **zero-context subagent** (a native capability, but still a dependency — the in-session agent remembers the design conversation and can't be truly zero-context); when the environment can't dispatch one, that step is not executable — BLOCKED to a human, never downgraded to self-review. Everything else below stays **out of the plugin** and is the user's personal global CLAUDE.md workflow config:
 
 - **Process-state routing** (where rationale / todos / history go): bind memory tools / Linear / git. Skills only declare "process-state stays out of the contract, routed out," not where to.
 - **Contract-conformance review** (does the implementation exactly == the contract) is the opposite — it's framework dogma, self-issued by `implement`'s exit gate, not outsourced.
