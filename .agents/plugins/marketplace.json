@@ -1,0 +1,19 @@
+{
+  "name": "northstar",
+  "interface": {
+    "displayName": "Northstar"
+  },
+  "plugins": [
+    {
+      "name": "northstar",
+      "source": {
+        "source": "url",
+        "url": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
