@@ -46,6 +46,14 @@ codex plugin marketplace add https://github.com/qwang07/northstar
 codex plugin add northstar@northstar
 ```
 
+## 3b. 日后更新（skills 与 agents 分开走）
+
+```bash
+codex plugin marketplace upgrade northstar
+codex plugin add northstar@northstar        # 重装即升级 skills
+cp .codex/agents/*.toml ~/.codex/agents/    # agents 无自动同步，重拷（覆盖本地改档，先 diff）
+```
+
 ## 4. 验证（已实测）
 
 ```bash

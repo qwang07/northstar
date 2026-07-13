@@ -40,7 +40,11 @@ northstar/
 │       ├── ns-implementer.md           implement-phase module executor (sonnet)
 │       ├── ns-simplifier.md            wrap-up simplification pass (opus)
 │       └── ns-reviewer.md              code-review-phase zero-context reviewer (opus)
-├── <Codex distribution & binding>      in-repo plugin manifest + agents TOML + install guide (manifest path & TOML schema follow Codex platform conventions; directory layout is implementation freedom)
+├── .codex-plugin/plugin.json           Codex plugin manifest (its skills field points at the shared dogma layer above)
+├── .agents/plugins/marketplace.json    Codex marketplace manifest
+├── .codex/agents/                      Codex binding layer: six agent TOMLs (ship with the repo, copied once into the user's directory)
+├── docs/codex-install.md               Codex install guide (tested commands + pinned-model table)
+├── tests/structure.py                  project-level structure tests (topology shape / binding tiers / forbidden-word invariant / reference integrity)
 ├── README.md
 └── README.en.md
 ```
@@ -113,7 +117,7 @@ Binding layer  Claude Code: plugins/northstar/agents/*.md (frontmatter pins opus
                Codex: agents TOML (per the platform agent schema, pinning concrete models + reasoning-effort tiers)
    ▲
 Distribution   Claude Code: .claude-plugin/ marketplace
-               Codex: in-repo plugin manifest (per the platform convention .codex-plugin/plugin.json); agents ship with the repo (not in the plugin) + one-time install guide
+               Codex: in-repo plugin manifest (per the platform convention .codex-plugin/plugin.json + marketplace manifest .agents/plugins/marketplace.json); agents ship with the repo (not in the plugin) + one-time install guide
 ```
 
 Binding layer = agent definitions + a **platform execution note** (one per platform: the item-by-item delivery declaration for the capability table, the platform-specific execution details extracted from the dogma, and platform prerequisites all live here; dogma text references it by pointer, location is implementation freedom). The criterion for "platform-specific": a platform's **named forms** of the three execution shapes ("edit in session / dispatch one executor / orchestrate parallel executors") and their isolation mechanics are extraction targets; cross-platform abstract concepts (subagent, dispatch, read-only retrieval) stay in the dogma.
