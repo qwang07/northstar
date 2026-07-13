@@ -7,14 +7,14 @@
   },
   "metadata": {
     "description": "Northstar：README 为唯一的、无时间的目标态真理；测试为其可执行投影；历史可追溯不可权威。",
-    "version": "0.8.1"
+    "version": "0.8.2"
   },
   "plugins": [
     {
       "name": "northstar",
       "source": "./plugins/northstar",
       "description": "自著教条层：brainstorming / write-test / audit / implement / diagnose / code-review 六技能，按活动切分（契约对话 / 派生守护物 / 独立评审 / 令红变绿）。brainstorming 为 README 唯一写入口（高度是参数）；write-test 分支产测试或验证清单（强断言纪律）；audit 零上下文双检查点（含断言强度审项）；diagnose 为缺陷标准入口（归因先于修复，出口分流回路）；code-review 为收尾质量刀；实现规模自适应。另含六个执行子代理（ns-scout / ns-diagnostician / ns-auditor / ns-implementer / ns-simplifier / ns-reviewer，模型分级钉死于 frontmatter）。六技能六子代理全自著、零外部 plugin 依赖，装上即独立运行。",
-      "version": "0.8.1"
+      "version": "0.8.2"
     }
   ]
 }

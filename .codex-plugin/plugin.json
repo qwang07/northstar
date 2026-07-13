@@ -1,6 +1,6 @@
 {
   "name": "northstar",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "契约驱动的开发回路：brainstorming 出 README 契约（唯一写入口）→ write-test 派生守护物 → audit 零上下文评审 → implement 令红变绿；diagnose 缺陷归因入口，code-review 收尾质量刀。README 为唯一的、无时间的目标态真理。",
   "author": { "name": "qwang07" },
   "homepage": "https://github.com/qwang07/northstar",
