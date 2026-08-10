@@ -1,11 +1,11 @@
 ---
 name: code-review
-description: "在 implement 令测试全绿后、收尾或合并前使用，对改动做仅代码质量的独立评审（潜在 bug、错误路径/静默失败、可维护性），锚定模块 README 契约为规格。零上下文子代理执行，发现只读。契约合规归 implement 门、设计完整归 audit，本 skill 不重复二者。触发：代码评审、code review、质量评审、审代码、查 bug、改动评审、合并前检查。"
+description: "在 implement 令测试全绿、simplify 精简之后、合并之前使用（收尾链末道），对改动做仅代码质量的独立评审（潜在 bug、错误路径/静默失败、可维护性），锚定模块 README 契约为规格。零上下文子代理执行，发现只读。契约合规归 implement 门、设计完整归 audit，本 skill 不重复二者。触发：代码评审、code review、质量评审、审代码、查 bug、改动评审、合并前检查。"
 ---
 
 # code-review —— 仅质量的独立评审（吸收自 superpowers，自著薄版）
 
-implement 令红变绿之后、收尾/合并之前。**只补"代码质量"那一刀**，不重复已有的关卡。
+收尾链末道：`simplify` 精简之后、合并之前（simplify 的适用范围按代码判，判据见该 skill；本轮无代码在其 scope 内时，直接从 implement 来）。**只补"代码质量"那一刀**，不重复已有的关卡。
 
 ## 边界（不重复造轮子）
 - **契约合规**（实现是否恰好 = 模块契约、有无多做/少做）→ 归 implement 退出门，本 skill 不碰。
@@ -38,7 +38,7 @@ Critical（bug / 数据丢失 / 静默失败）/ Important（错误处理、可�
 4. **禁表演性同意**：不写"你说得对 / 好发现"，直接陈述技术判断或直接动手——代码本身就是回应。评审建议"补全 / 做完整"时先查实际用量：无人使用 → 按不镀金原则拒绝；确有真实用量 → 那是"该写没写"的契约缺口，走第 2 岔回踢补契约后再做，不直接实现。
 
 ## 退出
-Critical、Important 已满足或已回踢上游 → 交收尾（code-simplifier 等，由工作流接）。
+Critical、Important 已满足或已回踢上游 → **收尾链结束**。回到模块循环取下一个未完成模块，或全部模块完成则触发 brainstorming 收口（项目级退出门）。
 
 ---
 来源：吸收自 superpowers `requesting-code-review` 6.0.3（检查清单 / Read-Only 纪律 / 严重度三档）+ `receiving-code-review` 6.1.1（发现处置：复核先于动手 / 三岔 / 禁表演性同意）+ `pr-review-toolkit:silent-failure-hunter`（错误路径棱镜）；自著适配为 northstar 嗓音，非 vendor。
