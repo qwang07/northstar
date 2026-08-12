@@ -2,26 +2,25 @@
 
 简体中文 | [English](README.en.md)
 
-一个 Claude Code plugin marketplace。**README 是唯一的、无时间的目标态真理；测试是其可执行投影；历史可追溯不可权威。**
+一个 Claude Code plugin，经 [qwang07/plugins](https://github.com/qwang07/plugins) marketplace 编目分发。**README 是唯一的、无时间的目标态真理；测试是其可执行投影；历史可追溯不可权威。**
 
 本框架把火力全部砸在一件事上：**把需求者意图在 README 里声明完整**（理由见「设计理念·两瓶颈坍缩为一」）。回路按**活动**切分：契约对话（brainstorming）→ 派生守护物（write-test）→ 独立评审（audit）→ 令红变绿（implement）→ 收尾链（simplify 精简 → code-review 质量刀）；缺陷经 diagnose 归因入口进入。**七个 skill 与六个执行子代理全自著、零外部 plugin 依赖（不挂 superpowers 等任何引擎），装上即独立运行。子代理按上下文隔离需求划分，与 skill 非一一对应**——brainstorming 与 write-test 是人机对话与就地派生，在主会话执行，不派子代理。
 
 ## 安装
 
 ```bash
-/plugin marketplace add qwang07/northstar
-/plugin install northstar@northstar
+/plugin marketplace add qwang07/plugins
+/plugin install northstar@qwang07
 ```
 
 安装后七个 skill 以命名空间出现：`northstar:brainstorming` / `:write-test` / `:audit` / `:implement` / `:simplify` / `:diagnose` / `:code-review`；Claude Code 侧六个执行子代理随插件注册：`ns-scout` / `ns-diagnostician` / `ns-auditor` / `ns-implementer` / `ns-simplifier` / `ns-reviewer`。
 
-Codex CLI 侧：skills 经同仓插件清单安装；agents 为随仓 TOML，按一次性安装指引（`docs/codex-install.md`，含实测命令与所钉型号表）拷入用户 agents 目录（条款见「跨平台拓扑」节）。
+Codex CLI 侧：skills 经同一 marketplace 编目安装；agents 为随仓 TOML，按一次性安装指引（`docs/codex-install.md`，含实测命令与所钉型号表）拷入用户 agents 目录（条款见「跨平台拓扑」节）。
 
 ## 结构
 
 ```
 northstar/
-├── .claude-plugin/marketplace.json     Claude Code catalog
 ├── plugins/northstar/
 │   ├── .claude-plugin/plugin.json      清单
 │   ├── skills/
@@ -39,8 +38,6 @@ northstar/
 │       ├── ns-implementer.md           implement 相模块级执行者（sonnet）
 │       ├── ns-simplifier.md            收尾链精简工序（opus）
 │       └── ns-reviewer.md              code-review 相零上下文评审者（opus）
-├── .codex-plugin/plugin.json           Codex 插件清单（skills 字段指向上方共享教条层）
-├── .agents/plugins/marketplace.json    Codex marketplace 清单
 ├── .codex/agents/                      Codex 绑定层：六 agent TOML（随仓分发，一次性拷入用户目录）
 ├── docs/codex-install.md               Codex 安装指引（实测命令 + 所钉型号表）
 ├── tests/structure.py                  项目级结构测试（拓扑形状 / 绑定分级 / 禁词不变量 / 引用完整性）
@@ -120,8 +117,8 @@ northstar 面向 Claude Code 与 Codex CLI 双平台分发。三层结构，层�
 绑定层    Claude Code：plugins/northstar/agents/*.md（frontmatter 钉 opus/sonnet/haiku）
           Codex：agents TOML（遵平台 agent schema，钉具体型号 + reasoning effort 档位）
    ▲
-分发层    Claude Code：.claude-plugin/ marketplace
-          Codex：同仓插件清单（遵平台约定 .codex-plugin/plugin.json + marketplace 清单 .agents/plugins/marketplace.json）；agents 不入插件，随仓分发 + 一次性安装指引
+分发层    双端同源：qwang07/plugins marketplace 以 git-subdir 收录 plugins/northstar——插件根即 plugins/northstar，双端共认；仓内不设第二编目（同一插件会双重上架）
+          agents 不入插件，随仓分发 + 一次性安装指引
 ```
 
 绑定层 = agents 定义 + **平台执行说明**（每平台一份：I-平台能力表的逐项兑现声明、教条抽离的平台专属执行细节、平台前置配置，皆落于此；教条正文以指针引用，位置属实现自由）。平台专属的判据：执行形态与机制的**平台具名词**（某平台对"会话内直改 / 派发单执行者 / 多执行者并行编排"三形态及其隔离机制的具体命名与语法）属抽离对象；跨平台共有的抽象概念（子代理、派发、只读检索）保留在教条。

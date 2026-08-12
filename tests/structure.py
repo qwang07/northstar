@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SKILLS_DIR = ROOT / "plugins/northstar/skills"
 AGENTS_DIR = ROOT / "plugins/northstar/agents"
 
-SKILLS = {"brainstorming", "write-test", "audit", "implement", "diagnose", "code-review"}
+SKILLS = {"brainstorming", "write-test", "audit", "implement", "simplify", "diagnose", "code-review"}
 AGENTS = {"ns-scout", "ns-diagnostician", "ns-auditor", "ns-implementer", "ns-simplifier", "ns-reviewer"}
 # 能力表第 5 项：判断类高档（评审 / 归因 / 精简）、执行类中档、检索类低档
 TIER = {
@@ -57,9 +57,9 @@ def read_frontmatter(path):
     ) if m else {}
 
 
-# T1 教条层：六 skill 目录各含 SKILL.md（拓扑·教条层）
+# T1 教条层：七 skill 目录各含 SKILL.md（拓扑·教条层）
 found_skills = {p.parent.name for p in SKILLS_DIR.glob("*/SKILL.md")}
-check("T1 教条层六 SKILL.md 齐备", found_skills == SKILLS,
+check("T1 教条层七 SKILL.md 齐备", found_skills == SKILLS,
       f"实际 {sorted(found_skills)} ≠ 声明 {sorted(SKILLS)}")
 
 # T2 Claude 绑定层：agents/ 文件集恰好等于花名册（拓扑·绑定层）
@@ -97,15 +97,16 @@ for a in sorted(AGENTS):
     check(f"T5 {a} TOML 钉型号+档位", bool(model) and effort in want_efforts,
           f"model={model!r}, effort={effort!r}（应为 {sorted(want_efforts)} 之一且型号非空）")
 
-# T6 分发层双侧（拓扑·分发层）：
-# Claude Code 侧：.claude-plugin/ marketplace（结构树钉死路径）
-check("T6 Claude marketplace 清单存在", (ROOT / ".claude-plugin/marketplace.json").is_file(),
-      "缺 .claude-plugin/marketplace.json")
+# T6 分发层（拓扑·分发层）：编目在外部 marketplace（qwang07/plugins，git-subdir 收录
+# plugins/northstar——插件根即 plugins/northstar，双端共认）；仓内只留插件清单。
+# 仓内第二编目已退役（同一插件会双重上架）——断言不存在，防复活。
 check("T6 Claude 插件清单存在", (ROOT / "plugins/northstar/.claude-plugin/plugin.json").is_file(),
       "缺 plugins/northstar/.claude-plugin/plugin.json")
-# Codex 侧：清单路径遵平台约定 .codex-plugin/plugin.json（目录布局自由 → 只钉尾部）
-codex_manifests = [p for p in ROOT.rglob(".codex-plugin/plugin.json") if ".git" not in p.parts]
-check("T6 Codex 插件清单存在", len(codex_manifests) >= 1, "仓库内未发现 .codex-plugin/plugin.json")
+check("T6 仓内 marketplace 已退役", not (ROOT / ".claude-plugin/marketplace.json").exists(),
+      "仓内 marketplace 复活——编目已移至 qwang07/plugins，双重编目 = 同插件双上架")
+stray_codex = [p for p in ROOT.rglob(".codex-plugin/plugin.json") if ".git" not in p.parts]
+check("T6 Codex 重定向清单已退役", not stray_codex,
+      f"发现 {[str(p) for p in stray_codex]}——git-subdir 下插件根即 plugins/northstar，无需重定向清单")
 
 # T9 Codex 安装指引：存在且声明所钉型号（C4 + 安装节）。发现式：含 .codex/agents 路径
 # 且列出全部六 agent 名的 Markdown 即指引；其须含每个 TOML 所钉型号字串。
@@ -162,6 +163,27 @@ for readme in ["README.md", "README.en.md"]:
     names = set(re.findall(r"\bns-[a-z]+\b", (ROOT / readme).read_text(encoding="utf-8")))
     check(f"T8 {readme} 花名册与 agents/ 全等", names == found_agents,
           f"README 引用 {sorted(names)} ≠ 目录 {sorted(found_agents)}")
+
+# T12 收敛阀阈值复述（README「节奏·回路收敛阀」的显式例外条款）：
+# 例外范围恰为枚举五相（契约回踢类），各处数值与 README 一致；枚举外教条不得携带同款复述。
+VALVE_SET = {"brainstorming", "write-test", "audit", "implement", "code-review"}
+VALVE_PAT = r"阈值（默认 (\d+) 次）"
+readme_vals = set(re.findall(VALVE_PAT, (ROOT / "README.md").read_text(encoding="utf-8")))
+check("T12 README 声明阈值", len(readme_vals) == 1,
+      f"README 阈值数值 {sorted(readme_vals)}（应恰一种）")
+valve_carriers = {}
+for s in sorted(SKILLS):
+    vals = set(re.findall(VALVE_PAT, (SKILLS_DIR / s / "SKILL.md").read_text(encoding="utf-8")))
+    if vals:
+        valve_carriers[s] = vals
+check("T12 阈值复述枚举齐全且无越界", set(valve_carriers) == VALVE_SET,
+      f"实际携带 {sorted(valve_carriers)} ≠ 枚举 {sorted(VALVE_SET)}")
+all_vals = readme_vals.union(*valve_carriers.values()) if valve_carriers else readme_vals
+check("T12 阈值各处数值一致", len(all_vals) == 1, f"数值不一 {sorted(all_vals)}")
+if len(all_vals) == 1:
+    _v = next(iter(all_vals))
+    check("T12 英文版阈值同值", f"default {_v}" in (ROOT / "README.en.md").read_text(encoding="utf-8"),
+          f"README.en.md 未见 default {_v}")
 
 print(f"\n{'全绿' if not failures else f'{len(failures)} 红'}：共 {len(failures)} 失败")
 sys.exit(1 if failures else 0)

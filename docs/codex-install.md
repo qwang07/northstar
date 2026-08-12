@@ -39,18 +39,20 @@ cp .codex/agents/*.toml ~/.codex/agents/
 
 所钉型号随 OpenAI 谱系迭代；若你的订阅档位无某型号权限，或想控制成本，可直接编辑 `~/.codex/agents/` 里的副本改型号 / 降 effort——分级原则（判断高 / 执行中 / 检索低）保持即可。注意：降档会相应降低该环节（评审 / 归因 / 精简）的判别力，取舍自担。
 
-## 3. 安装 skills（已实测）
+## 3. 安装 skills
 
 ```bash
-codex plugin marketplace add https://github.com/qwang07/northstar
-codex plugin add northstar@northstar
+codex plugin marketplace add https://github.com/qwang07/plugins
+codex plugin add northstar@qwang07
 ```
+
+（0.9.0 起编目移至 qwang07/plugins，git-subdir 收录 plugins/northstar；原同仓 marketplace 路径已退役。旧路径命令曾实测通过，新路径 Codex 侧待复测。）
 
 ## 3b. 日后更新（skills 与 agents 分开走）
 
 ```bash
-codex plugin marketplace upgrade northstar
-codex plugin add northstar@northstar        # 重装即升级 skills
+codex plugin marketplace upgrade qwang07
+codex plugin add northstar@qwang07          # 重装即升级 skills
 cp .codex/agents/*.toml ~/.codex/agents/    # agents 无自动同步，重拷（覆盖本地改档，先 diff）
 ```
 

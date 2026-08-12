@@ -4,26 +4,25 @@
 
 > The Chinese [README.md](README.md) is the source of truth; this English version is a projection and may lag.
 
-A Claude Code plugin marketplace. **The README is the single, timeless source of target-state truth; tests are its executable projection; history is traceable but never authoritative.**
+A Claude Code plugin, catalogued and distributed via the [qwang07/plugins](https://github.com/qwang07/plugins) marketplace. **The README is the single, timeless source of target-state truth; tests are its executable projection; history is traceable but never authoritative.**
 
 This framework concentrates all firepower on one thing: **declaring the requester's intent completely in the README** (rationale: see "Design philosophy · Two bottlenecks collapse into one"). The loop is split by **activity**: contract dialogue (brainstorming) → derive guards (write-test) → independent review (audit) → turn red green (implement) → the wrap-up chain (simplify → code-review); defects enter through the diagnose attribution gate. **All seven skills and six execution subagents are self-authored with zero external plugin dependencies (no superpowers or any other engine); it runs standalone once installed. Subagents are split by context-isolation need, not one-per-skill** — brainstorming and write-test are human dialogue and in-place derivation, run in the main session with no subagent dispatched.
 
 ## Install
 
 ```bash
-/plugin marketplace add qwang07/northstar
-/plugin install northstar@northstar
+/plugin marketplace add qwang07/plugins
+/plugin install northstar@qwang07
 ```
 
 After install, the seven skills appear namespaced: `northstar:brainstorming` / `:write-test` / `:audit` / `:implement` / `:simplify` / `:diagnose` / `:code-review`; on the Claude Code side, six execution subagents register with the plugin: `ns-scout` / `ns-diagnostician` / `ns-auditor` / `ns-implementer` / `ns-simplifier` / `ns-reviewer`.
 
-Codex CLI side: skills install via the in-repo plugin manifest; agents are in-repo TOML files, copied once into the user's agents directory per the install guide (`docs/codex-install.md`, with tested commands and the pinned-model table — clauses in the Cross-platform topology section).
+Codex CLI side: skills install via the same marketplace catalog; agents are in-repo TOML files, copied once into the user's agents directory per the install guide (`docs/codex-install.md`, with tested commands and the pinned-model table — clauses in the Cross-platform topology section).
 
 ## Structure
 
 ```
 northstar/
-├── .claude-plugin/marketplace.json     Claude Code catalog
 ├── plugins/northstar/
 │   ├── .claude-plugin/plugin.json      manifest
 │   ├── skills/
@@ -41,8 +40,6 @@ northstar/
 │       ├── ns-implementer.md           implement-phase module executor (sonnet)
 │       ├── ns-simplifier.md            wrap-up chain simplification pass (opus)
 │       └── ns-reviewer.md              code-review-phase zero-context reviewer (opus)
-├── .codex-plugin/plugin.json           Codex plugin manifest (its skills field points at the shared dogma layer above)
-├── .agents/plugins/marketplace.json    Codex marketplace manifest
 ├── .codex/agents/                      Codex binding layer: six agent TOMLs (ship with the repo, copied once into the user's directory)
 ├── docs/codex-install.md               Codex install guide (tested commands + pinned-model table)
 ├── tests/structure.py                  project-level structure tests (topology shape / binding tiers / forbidden-word invariant / reference integrity)
@@ -122,8 +119,8 @@ Dogma layer    plugins/northstar/skills/ seven SKILL.md — single source, platf
 Binding layer  Claude Code: plugins/northstar/agents/*.md (frontmatter pins opus/sonnet/haiku)
                Codex: agents TOML (per the platform agent schema, pinning concrete models + reasoning-effort tiers)
    ▲
-Distribution   Claude Code: .claude-plugin/ marketplace
-               Codex: in-repo plugin manifest (per the platform convention .codex-plugin/plugin.json + marketplace manifest .agents/plugins/marketplace.json); agents ship with the repo (not in the plugin) + one-time install guide
+Distribution   One source for both ends: the qwang07/plugins marketplace pulls plugins/northstar in by git-subdir — the plugin root IS plugins/northstar, agreed by both clients; no second in-repo catalog (it would surface the same plugin twice)
+               agents ship with the repo (not in the plugin) + one-time install guide
 ```
 
 Binding layer = agent definitions + a **platform execution note** (one per platform: the item-by-item delivery declaration for the capability table, the platform-specific execution details extracted from the dogma, and platform prerequisites all live here; dogma text references it by pointer, location is implementation freedom). The criterion for "platform-specific": a platform's **named forms** of the three execution shapes ("edit in session / dispatch one executor / orchestrate parallel executors") and their isolation mechanics are extraction targets; cross-platform abstract concepts (subagent, dispatch, read-only retrieval) stay in the dogma.
