@@ -1,27 +1,52 @@
 # Claude Code 平台执行说明（绑定层）
 
-northstar 教条正文只用抽象动作；本文声明 Claude Code 平台对 **I-平台能力表** 的逐项兑现，并承接教条抽离的平台执行细节。Codex 平台见同目录 `platform-codex.md`。
+northstar 教条正文只用抽象动作与声明式约束；本文是 Claude Code 侧**唯一**的绑定载体：声明 I-平台能力表的逐项兑现、把教条声明翻译为本平台调用参数、承接教条抽离的平台执行细节。Codex 平台见同目录 `platform-codex.md`。
+
+**不设 agent 定义文件**：执行者人格由派发者按对应 SKILL.md 现场组装（教条是唯一来源）。
 
 ## I-平台能力表逐项兑现
 
 | # | 能力 | Claude Code 兑现 |
 |---|---|---|
-| 1 | 零上下文子代理（两把刀） | audit → `ns-auditor`；code-review → `ns-reviewer`。以 Task 工具派发；dispatch 输入只含 README + 测试 / 清单（或 diff），禁背景偷渡 |
-| 2 | 执行者与归因者 | implement 整模块 → `ns-implementer`；diagnose → `ns-diagnostician` |
-| 3 | 只读检索 | `ns-scout` |
-| 4 | 收尾精简 | `ns-simplifier` |
-| 5 | 模型 / 档位分级 | 钉死于各 agent 定义 frontmatter：判断类 opus（ns-auditor / ns-reviewer / ns-diagnostician / ns-simplifier）、执行类 sonnet（ns-implementer）、检索类 haiku（ns-scout） |
+| 1 | 零上下文子代理（audit / code-review 两把刀） | 派发通用子代理类型；零上下文由**输入封闭**保证——子代理天然不继承主会话对话，prompt 内只放 README + 测试 / 清单 + 本轮 diff，禁背景偷渡（红线见各自 SKILL.md） |
+| 2 | 执行者（implement）与归因者（diagnose） | 同上派发路径，档位按声明取（下表） |
+| 3 | 只读检索定位 | 同上派发路径，检索类低档；属横切能力，任何相可用 |
+| 4 | 零写码记忆的精简执行者（simplify） | 同上派发路径，判断类高档；**工作区可写**（本相动手改），不叙述实施过程 |
+| 5 | 模型 / 推理档位分级 | 以派发的 `model` 参数落定，见下表 |
+| 6 | 声明式约束的翻译 | 见下两节 |
+
+## 声明式约束 → 调用参数
+
+| 教条声明 | 本平台调用参数 |
+|---|---|
+| 推理档位 = 判断类高档 | `model: opus` |
+| 推理档位 = 执行类中档 | `model: sonnet` |
+| 推理档位 = 检索类低档 | `model: haiku` |
+| 工具面 = 读写 | 默认，无需额外参数 |
+| 工具面 = 只读 | **本平台无对应调用参数**——以提示词明令 + 返回后基线比对兑现，见下节 |
+
+**必传 `model`**：不显式指定会静默继承主会话模型（通常是最贵档），整张档位路由表随之架空。同理禁设 `CLAUDE_CODE_SUBAGENT_MODEL` 环境变量——其优先级高于一切，会静默覆盖派发参数。
+
+## 只读工具面的兑现与核验（承接 README「跨平台拓扑·横切约束」）
+
+**实测依据（2026-08）**：本平台派发工具**不接受** `tools` / `allowed_tools` / `permission_mode` 等工具面参数——工具面只能由 agent 定义文件固化，而本 plugin 不设定义文件。故事前枚举不可得，只读以**事后核验**成立：
+
+1. **派发前记基线**：`git status --porcelain`（含未跟踪）+ `git rev-parse HEAD`。
+2. **提示词明令**：只读——不得编辑 / 写入 / 移动任何文件，不得动工作树、暂存区与 HEAD；要看其他版本另开 worktree。
+3. **返回后比对**：重取同一组基线值；与派发前不一致 → **该次判决作废 + 回滚越权改动（`git checkout -- .` / `git clean -fd` 按需）+ BLOCKED 升级给人**，其结论一律不采信。
+
+比对不通过属"独立性已破"，不是"小问题"——评审者动过手，它的判决就不再是零上下文判决。
 
 ## 执行三形态的平台兑现（implement 相）
 
-- 会话内直改 → 主会话直接编辑（inline）
-- 派发单执行者 → Task 工具派发 subagent
-- 多执行者并行编排 → Workflow 工具编排（脚本化 fan-out），worktree 隔离防冲突
+- 会话内直改 → 主会话直接编辑
+- 派发单执行者 → 派发工具阻塞等待（`run_in_background` 关闭，需要拿回结果才能继续回路）
+- 多执行者并行编排 → 脚本化 fan-out 编排；`isolation: worktree` 给各执行者独立 git worktree 防冲突
 
 ## 派发细则（教条抽离承接）
 
-- **模型不覆写**：派发 ns-* 时不显式传 model 参数——档位已由 frontmatter 钉死；禁设 `CLAUDE_CODE_SUBAGENT_MODEL` 环境变量（其优先级高于 frontmatter，会静默架空整张路由表）。
-- **未钉档的临时派发**（如天真代理压测）沿用同一分级原则选档：判断 / 评审类最高档、执行类中档、机械转录与检索类最低档——不显式指定会静默继承主会话（最贵）模型。
-- **内循环 diff 核对**：主会话亲自读 diff，或轻量派 `ns-reviewer`（同 code-review 评审者）提前把关——收尾 code-review 刀不因此免除。
+- **人格现场组装**：派发提示词按对应 SKILL.md 现写，不另存副本。教条改了，下一次派发自动跟上——这是删除 agent 定义文件换来的单源性。
+- **未钉档的临时派发**（如天真代理压测）沿用同一分级原则选档：判断 / 评审类最高档、执行类中档、机械转录与检索类最低档。
+- **内循环 diff 核对**：主会话亲自读 diff，或轻量派一个判断类高档评审者提前把关——收尾 code-review 刀不因此免除。
 - **回合固化兑现**：教条「回合起点与固化」在本平台以 git 提交兑现——起点 = 回合入口记录的提交号（过程态出境），固化 = implement 退出前提交；「本轮 diff」即两提交之差（`git diff 起点..固化点`）。
-- **平台前置**：无；northstar 插件装上即含六 agent。
+- **平台前置**：无；装上插件即可派发。

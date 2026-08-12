@@ -6,7 +6,7 @@
 
 A Claude Code plugin, catalogued and distributed via the [qwang07/plugins](https://github.com/qwang07/plugins) marketplace. **The README is the single, timeless source of target-state truth; tests are its executable projection; history is traceable but never authoritative.**
 
-This framework concentrates all firepower on one thing: **declaring the requester's intent completely in the README** (rationale: see "Design philosophy · Two bottlenecks collapse into one"). The loop is split by **activity**: contract dialogue (brainstorming) → derive guards (write-test) → independent review (audit) → turn red green (implement) → the wrap-up chain (simplify → code-review); defects enter through the diagnose attribution gate. **All seven skills and six execution subagents are self-authored with zero external plugin dependencies (no superpowers or any other engine); it runs standalone once installed. Subagents are split by context-isolation need, not one-per-skill** — brainstorming and write-test are human dialogue and in-place derivation, run in the main session with no subagent dispatched.
+This framework concentrates all firepower on one thing: **declaring the requester's intent completely in the README** (rationale: see "Design philosophy · Two bottlenecks collapse into one"). The loop is split by **activity**: contract dialogue (brainstorming) → derive guards (write-test) → independent review (audit) → turn red green (implement) → the wrap-up chain (simplify → code-review); defects enter through the diagnose attribution gate. **All seven skills are self-authored with zero external plugin dependencies (no superpowers or any other engine); it runs standalone once installed. No executor definitions ship with it** — each phase declares its tool face and reasoning tier in the dogma, and the platform execution note translates those into dispatch parameters. Not every phase dispatches: brainstorming and write-test are human dialogue and in-place derivation, run in the main session.
 
 ## Install
 
@@ -15,9 +15,9 @@ This framework concentrates all firepower on one thing: **declaring the requeste
 /plugin install northstar@qwang07
 ```
 
-After install, the seven skills appear namespaced: `northstar:brainstorming` / `:write-test` / `:audit` / `:implement` / `:simplify` / `:diagnose` / `:code-review`; on the Claude Code side, six execution subagents register with the plugin: `ns-scout` / `ns-diagnostician` / `ns-auditor` / `ns-implementer` / `ns-simplifier` / `ns-reviewer`.
+After install, the seven skills appear namespaced: `northstar:brainstorming` / `:write-test` / `:audit` / `:implement` / `:simplify` / `:diagnose` / `:code-review`. **No executor definitions are shipped** — each phase declares its tool face and reasoning tier in the dogma; the platform execution note translates them into this platform's dispatch parameters (see Cross-platform topology).
 
-Codex CLI side: skills install via the same marketplace catalog; agents are in-repo TOML files, copied once into the user's agents directory per the install guide (`docs/codex-install.md`, with tested commands and the pinned-model table — clauses in the Cross-platform topology section).
+Codex CLI side: skills install via the same marketplace catalog; platform prerequisites (the multi-agent switch) and the tier→model table live in `docs/codex-install.md`.
 
 ## Structure
 
@@ -25,23 +25,16 @@ Codex CLI side: skills install via the same marketplace catalog; agents are in-r
 northstar/
 ├── plugins/northstar/
 │   ├── .claude-plugin/plugin.json      manifest
-│   ├── skills/
-│   │   ├── brainstorming/SKILL.md      contract phase: dialogue into README (sole write entry, clauses land at their authoritative layer)
-│   │   ├── write-test/SKILL.md         test phase: derive tests or a verification checklist from the README
-│   │   ├── audit/SKILL.md              independent review: zero-context audit (two checkpoints)
-│   │   ├── implement/SKILL.md          turn red green: means chosen by scale
-│   │   ├── simplify/SKILL.md           wrap-up chain, first pass: simplify this round's diff with zero authoring memory
-│   │   ├── diagnose/SKILL.md           defect entry: attribution before any fix, exits routed back into the loop
-│   │   └── code-review/SKILL.md        wrap-up chain, last pass: zero-context code-quality review
-│   └── agents/
-│       ├── ns-scout.md                 read-only retrieval (haiku)
-│       ├── ns-diagnostician.md         diagnose-phase attributor (opus)
-│       ├── ns-auditor.md               audit-phase zero-context reviewer (opus)
-│       ├── ns-implementer.md           implement-phase module executor (sonnet)
-│       ├── ns-simplifier.md            wrap-up chain simplification pass (opus)
-│       └── ns-reviewer.md              code-review-phase zero-context reviewer (opus)
-├── .codex/agents/                      Codex binding layer: six agent TOMLs (ship with the repo, copied once into the user's directory)
-├── docs/codex-install.md               Codex install guide (tested commands + pinned-model table)
+│   └── skills/
+│       ├── brainstorming/SKILL.md      contract phase: dialogue into README (sole write entry, clauses land at their authoritative layer)
+│       ├── write-test/SKILL.md         test phase: derive tests or a verification checklist from the README
+│       ├── audit/SKILL.md              independent review: zero-context audit (two checkpoints)
+│       ├── implement/SKILL.md          turn red green: means chosen by scale
+│       ├── implement/references/       binding layer: both platform execution notes (declaration → dispatch parameters)
+│       ├── simplify/SKILL.md           wrap-up chain, first pass: simplify this round's diff with zero authoring memory
+│       ├── diagnose/SKILL.md           defect entry: attribution before any fix, exits routed back into the loop
+│       └── code-review/SKILL.md        wrap-up chain, last pass: zero-context code-quality review
+├── docs/codex-install.md               Codex prerequisites (multi-agent switch + tier→model table)
 ├── tests/structure.py                  project-level structure tests (topology shape / binding tiers / forbidden-word invariant / reference integrity)
 ├── README.md
 └── README.en.md
@@ -117,14 +110,14 @@ northstar ships for two platforms, Claude Code and Codex CLI. Three layers, conn
 ```
 Dogma layer    plugins/northstar/skills/ seven SKILL.md — single source, platform-agnostic
    ▲ via the I-platform-capability table
-Binding layer  Claude Code: plugins/northstar/agents/*.md (frontmatter pins opus/sonnet/haiku)
-               Codex: agents TOML (per the platform agent schema, pinning concrete models + reasoning-effort tiers)
+Binding layer  One platform execution note per platform (skills/implement/references/platform-*.md) — the sole carrier
+               translates the dogma's declarative constraints (tool face / reasoning tier) into this platform's dispatch parameters
    ▲
 Distribution   One source for both ends: the qwang07/plugins marketplace pulls plugins/northstar in by git-subdir — the plugin root IS plugins/northstar, agreed by both clients; no second in-repo catalog (it would surface the same plugin twice)
-               agents ship with the repo (not in the plugin) + one-time install guide
+               the binding layer ships single-source alongside skills, nothing extra to install; platform prerequisites are in each install guide
 ```
 
-Binding layer = agent definitions + a **platform execution note** (one per platform: the item-by-item delivery declaration for the capability table, the platform-specific execution details extracted from the dogma, and platform prerequisites all live here; dogma text references it by pointer, location is implementation freedom). The criterion for "platform-specific": a platform's **named forms** of the three execution shapes ("edit in session / dispatch one executor / orchestrate parallel executors") and their isolation mechanics are extraction targets; cross-platform abstract concepts (subagent, dispatch, read-only retrieval) stay in the dogma.
+Binding layer = the **platform execution note** (one per platform, sole carrier: the item-by-item delivery declaration for the capability table, the declaration→dispatch-parameter translation rules, the platform-specific execution details extracted from the dogma, and platform prerequisites all live here; dogma text references it by pointer, location is implementation freedom). **No agent definition files** — executor personas are composed on the spot by the dispatcher from the dogma; a definition file would only become a second copy of the dogma, and copies drift (measured: the dispatcher already composes the full prompt itself, so the persona in the file is redundant at runtime, and it had already drifted one version behind the dogma). The criterion for "platform-specific": a platform's **named forms** of the three execution shapes ("edit in session / dispatch one executor / orchestrate parallel executors") and their isolation mechanics are extraction targets; cross-platform abstract concepts (subagent, dispatch, read-only retrieval) stay in the dogma.
 
 **I-platform-capability table** (the dogma↔binding interface contract): dogma text expresses platform actions only in abstract verbs; each binding layer declares, item by item, how its platform delivers —
 1. Dispatch a zero-context subagent (the two cuts: audit / code-review)
@@ -132,27 +125,29 @@ Binding layer = agent definitions + a **platform execution note** (one per platf
 3. Read-only retrieval
 4. Dispatch a **zero-authoring-memory** simplification executor (simplify) — it edits code, unlike the read-only cuts of item 1
 5. Model / reasoning-effort tiering: judgment high (review / attribution / simplification), execution medium, retrieval low
+6. **Translating the declarative constraints**: how each phase's declared "tool face = read-only / read-write" and "reasoning tier" become this platform's dispatch parameters — including how read-only is verified
 
 **Cross-cutting constraints (shared by both bindings)**:
+- **Read-only tool face is delivered by baseline comparison**: for dispatches declaring "tool face = read-only" (the two cuts, audit / code-review), record the workspace baseline before dispatch and compare after return — **any change = that verdict is void + the change is rolled back + BLOCKED to a human**. Post-hoc verification replaces up-front enumeration: a tool allowlist is a closed set that neither survives a platform offering no tool-face control nor stops shutting out newly added retrieval tools; baseline comparison holds on any platform, with any tool set.
 - Dogma text must contain no platform-specific names (tool names / config fields / invocation syntax) — enforced as a mechanically assertable lasting invariant
 - Each binding delivers every item of the capability table; any undeliverable item = that step explicitly unavailable on that platform, silent degradation forbidden (every item resting on a hard subagent dependency — the two zero-context cuts and the zero-authoring-memory simplifier — defers to the BLOCKED axiom in the next section, pointer not restatement)
 - Loop orchestration is always "main session → one layer of subagents"; no skill may require a subagent to dispatch further subagents
-- The Codex binding pins concrete models: the install guide must state the required models and note that users may change models / tiers in their local copies; the release process includes "verify pinned models are still valid" `[load-bearing, keep]`
+- Wherever a binding pins concrete models (e.g. the Codex tiers): the platform execution note must state the model per tier, and the install guide carries a subscription-tier downgrade table; the release process includes "verify pinned models are still valid" `[load-bearing, keep]`
 
 ## Plugin boundary: dogma + execution bindings (three hard subagent dependencies)
 
-The plugin = seven skills (dogma, tool-agnostic) + six subagents (execution bindings: per-phase executors and model tiering; shipped with the plugin on the Claude Code side, and as the same definitions in TOML shipped with the repo on the Codex side — see the Cross-platform topology section; both under version control, no longer stray files). **Three hard platform dependencies** (all native capabilities, but dependencies nonetheless): `audit` and `code-review` must dispatch a **zero-context subagent** (the in-session agent remembers the design conversation and can't be truly zero-context); `simplify` must dispatch a **zero-authoring-memory executor** (the in-session agent remembers how the code came to be, so simplifying it yourself is playing amnesiac). The distinction between the two is in the Design philosophy entry of the same name. When the environment can't dispatch one, that step is not executable — BLOCKED to a human, never downgraded to self-review. Everything else below stays **out of the plugin** and is the user's personal global CLAUDE.md workflow config:
+The plugin = seven skills (dogma, tool-agnostic) + two platform execution notes (the binding layer: translating declarative constraints into dispatch parameters — see the Cross-platform topology section). **No agent definition files at all**: each phase declares its executor's tool face and reasoning tier in the dogma, and the persona is composed on the spot by the dispatcher. **Three hard platform dependencies** (all native capabilities, but dependencies nonetheless): `audit` and `code-review` must dispatch a **zero-context subagent** (the in-session agent remembers the design conversation and can't be truly zero-context); `simplify` must dispatch a **zero-authoring-memory executor** (the in-session agent remembers how the code came to be, so simplifying it yourself is playing amnesiac). The distinction between the two is in the Design philosophy entry of the same name. When the environment can't dispatch one, that step is not executable — BLOCKED to a human, never downgraded to self-review. Everything else below stays **out of the plugin** and is the user's personal global CLAUDE.md workflow config:
 
 - **Process-state routing** (where rationale / todos / history go): bind memory tools / GitHub Issues / git. Skills only declare "process-state stays out of the contract, routed out," not where to.
 - **Contract-conformance review** (does the implementation exactly == the contract) is the opposite — it's framework dogma, self-issued by `implement`'s exit gate, not outsourced.
 
 ## Independence: self-contained, no external engine
 
-All seven skills and six subagents are self-authored, **depending on / reusing / pinning no external plugin** (including superpowers and other official engines; `simplify`'s simplification discipline was digested from the official code-simplifier and re-authored, with a source line kept in its SKILL.md). northstar runs standalone once installed.
+All seven skills are self-authored, **depending on / reusing / pinning no external plugin** (including superpowers and other official engines; `simplify`'s simplification discipline was digested from the official code-simplifier and re-authored, with a source line kept in its SKILL.md). northstar runs standalone once installed.
 
 **Why no external engine**: borrowing an off-the-shelf TDD / review engine was considered and dropped after a fit assessment — "don't reinvent the wheel" holds only when it's "redundant and unnecessary," and northstar needs things an external engine can't give:
 
-- the "test itself is wrong → kick back to brainstorming / write-test to regenerate" loop, plus subagent model-tiering — generic engines lack these;
+- the "test itself is wrong → kick back to brainstorming / write-test to regenerate" loop, plus the per-phase declared reasoning-tier routing — generic engines lack these;
 - "test before implementation" is already **structurally guaranteed** by the pipeline order (README → tests → implementation), making the engine's core value redundant here.
 
 So each skill self-authors a thin layer that nails only its own loop and invariants, without rebuilding an engine. Absorbed external methodology (the brainstorming / write-test dialogue and derivation paradigms, systematic-debugging → diagnose, receiving-code-review → code-review's handling section, code-simplifier → simplify's simplification discipline, writing-skills' naive-agent pressure test → this repo's acceptance gate for skill texts) is credited in a provenance line at the end of each SKILL.md — traceable, not vendored.

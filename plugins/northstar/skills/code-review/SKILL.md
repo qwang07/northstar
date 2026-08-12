@@ -15,6 +15,7 @@ description: "在 implement 令测试全绿、simplify 精简之后、合并之�
 ## 机制：零上下文子代理（同 audit 一脉）
 派零上下文子代理评审——输入**仅** git diff（BASE..HEAD）+ **模块 README 契约**（作为规格）+ 一句改动描述；**不给 session 历史、不补背景**（同 audit 的 dispatch 红线，防 controller 善意泄漏把上下文偷渡进去）。
 **只读 checkout**：评审不得动 working tree / index / HEAD；要看别的版本就 `git worktree` 到临时目录，绝不在本 checkout 上挪 HEAD。
+**派发声明**：工具面 = 只读 · 推理档位 = 判断类高档。（只读如何兑现与核验见项目 README「跨平台拓扑·横切约束」；档位如何落成调用参数见平台执行说明，此处均不复述。）
 
 ## 检查清单（锚定模块 README 契约）
 - **契约偏离**：实现是否偏离模块 README？只**标记偏离让人确认**，不在此裁决——裁决是 implement 门的事。
