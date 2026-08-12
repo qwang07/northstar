@@ -76,8 +76,12 @@ for s, (want_face, want_tier) in DISPATCH.items():
           faces == {want_face} and tiers == {want_tier},
           f"实际 工具面={sorted(faces)} 档位={sorted(tiers)}")
 
-# T4 平台执行说明（绑定层唯一载体）：每平台一份，逐项兑现不接受空壳——
-# 强断言：须含 I-平台能力表 + 全部三档位的翻译落点 + 两种工具面，缺一即空壳。
+# ── T4 / T5 的量具分层（见 write-test「兑现类契约的两层量具」）────────────────
+# 这两条守的是「平台执行说明逐项兑现，不接受空壳」——那是**兑现类契约**，本文件
+# 只承担其可机械断言的一半：**覆盖齐全 + 落点互异 + 落点确含被翻译一侧没有的记号**。
+# 三者足以判死"关键词各写一遍"的空壳，但证明不了兑现真能被消费。
+# **兑现本身归消费方行为**：天真子代理只凭该说明能否派出参数正确的一次委派——
+# 那是压测的活，不在本文件。切勿把下面的绿当成"兑现已验证"。
 def platform_notes(platform_word):
     found = []
     for p in ROOT.rglob("*.md"):
@@ -89,21 +93,92 @@ def platform_notes(platform_word):
             found.append((p, t))
     return found
 
+
+ROW_PAT = re.compile(r"^\|([^|\n]+)\|([^|\n]+)\|\s*$", re.M)
+CAP_ROW_PAT = re.compile(r"^\|\s*(\d+)\s*\|([^|\n]+)\|([^|\n]+)\|\s*$", re.M)
+TOKEN_PAT = re.compile(r"[A-Za-z][A-Za-z0-9_.\-]{1,}")
+
+
+def mapping_rows(text):
+    """「声明式约束 → 调用参数」表：{声明键: 右列原文}。键取 `X = Y` 的 Y。"""
+    rows = {}
+    for lhs, rhs in ROW_PAT.findall(text):
+        m = re.search(r"(?:推理档位|工具面|零上下文)\s*=?\s*([^\s|（(]*)", lhs)
+        key = m.group(1).strip() if m else ""
+        if key in TIERS or key in ("只读", "读写"):
+            rows.setdefault(key, (lhs.strip(), rhs.strip()))
+    return rows
+
+
 notes = {}
 for plat in ("Claude Code", "Codex"):
     found = platform_notes(plat)
     notes[plat] = found
-    ok = len(found) >= 1 and all(
-        all(tier in t for tier in TIERS) and "只读" in t and "读写" in t for _, t in found)
-    check(f"T4 {plat} 平台执行说明存在且逐项兑现", ok,
-          "缺说明，或未覆盖全部三档位与两种工具面的调用参数翻译")
+    if not found:
+        check(f"T4 {plat} 平台执行说明存在", False, "未发现该平台的说明（含 I-平台能力表且标题点名平台）")
+        continue
+    for p, t in found:
+        # T4a 能力表逐项：I-平台能力表须 1..6 项齐全，且每项兑现列非空（空格 / 破折号 / 待定不算）
+        caps = {int(n): rhs.strip() for n, _, rhs in CAP_ROW_PAT.findall(t)}
+        hollow = sorted(n for n in range(1, 7)
+                        if n not in caps or caps[n].strip(" —-–*") in ("", "待定", "TBD", "N/A"))
+        check(f"T4a {plat} 能力表 1-6 项各有非空兑现", not hollow,
+              f"缺项或兑现列为空：{hollow}（逐项兑现不接受空壳）")
 
-# T5 只读工具面以基线比对兑现（横切约束）：双平台说明皆须给出核验机制与失败处置
+        # T4b 翻译表覆盖：三档位 + 两工具面各恰一行
+        rows = mapping_rows(t)
+        want = set(TIERS) | {"只读", "读写"}
+        check(f"T4b {plat} 翻译表覆盖三档位与两工具面", set(rows) == want,
+              f"实际 {sorted(rows)} ≠ 应有 {sorted(want)}")
+
+        # T4c 三档位落点两两互异——同一个值写三遍等于没分级
+        tier_vals = [rows[k][1] for k in TIERS if k in rows]
+        check(f"T4c {plat} 三档位落点互异", len(set(tier_vals)) == len(tier_vals) == len(TIERS),
+              f"落点重复或缺失：{tier_vals}")
+
+        # T4d 三档位落点确含左列没有的平台记号——证明发生了翻译，而非把声明复述一遍
+        norestate = []
+        for k in TIERS:
+            if k not in rows:
+                continue
+            lhs, rhs = rows[k]
+            if not (set(TOKEN_PAT.findall(rhs)) - set(TOKEN_PAT.findall(lhs))):
+                norestate.append(k)
+        check(f"T4d {plat} 三档位落点非左列复述", not norestate,
+              f"{norestate} 的右列无左列以外的平台记号——是复述不是翻译")
+
+        # T4e 两工具面落点非空且非左列原样复述（其中只读的实质兑现由 T5 接手）
+        faces_bad = [k for k in ("只读", "读写")
+                     if k not in rows or rows[k][1].strip(" —-–*") in ("", rows[k][0].strip())]
+        check(f"T4e {plat} 两工具面落点非空非复述", not faces_bad, f"空或复述：{faces_bad}")
+
+# T5 只读工具面的事后核验（横切约束）——同样只测结构层：
+# 核验节存在 + 步骤成序（≥3 步）+ 至少一条**可执行**的基线取值命令。
+# 空壳文档写得出"基线 / 作废 / BLOCKED"这几个词，写不出可跑的取值命令与成序步骤；
+# "不一致时判决真的被作废了吗"是行为，归压测，不在本文件。
+STEP_PAT = re.compile(r"^\s*(\d+)\.\s+\S", re.M)
+CMD_PAT = re.compile(r"`([^`\n]*\bgit\s+[^`\n]+)`")
 for plat, found in notes.items():
-    ok = bool(found) and all(
-        "基线" in t and "作废" in t and "BLOCKED" in t for _, t in found)
-    check(f"T5 {plat} 声明只读核验（基线比对 + 判决作废 + BLOCKED）", ok,
-          "只读工具面无事后核验条款——事前枚举不可得时，只读即无兑现")
+    for p, t in found:
+        sec = ""
+        for chunk in re.split(r"^##\s+", t, flags=re.M)[1:]:
+            head = chunk.splitlines()[0]
+            if "只读" in head and "核验" in head:
+                sec = chunk
+                break
+        if not sec:
+            check(f"T5 {plat} 只读核验节存在", False,
+                  "无「只读工具面的兑现与核验」小节——事前枚举不可得时，只读即无兑现")
+            continue
+        steps = STEP_PAT.findall(sec)
+        # 命令须落在**第一步（记基线）**内：整节找命令会被后面的回滚命令顶替，
+        # 于是"基线取值改成散文"这一变异捕获不到——已实测，故按步定位。
+        parts = re.split(r"^\s*\d+\.\s+", sec, flags=re.M)
+        first_step = parts[1] if len(parts) > 1 else ""
+        cmds = CMD_PAT.findall(first_step)
+        check(f"T5 {plat} 只读核验成序且记基线落到可执行取值", len(steps) >= 3 and bool(cmds),
+              f"编号步骤 {len(steps)} 条（应 ≥3：记基线 / 明令 / 返回后比对）、"
+              f"首步可执行取值命令 {len(cmds)} 条（应 ≥1）——基线取不出具体值，比对即无从谈起")
 
 # T6 分发层（拓扑·分发层）：编目在外部 marketplace（qwang07/plugins，git-subdir 收录
 # plugins/northstar——插件根即 plugins/northstar，双端共认）；仓内只留插件清单。
@@ -126,6 +201,9 @@ for readme in ("README.md", "README.en.md"):
     check(f"T8 {readme} 无执行者具名残留", not names, f"残留 {names}")
 
 # T9 Codex 安装指引：存在且各档位型号与平台说明一致（C4 + 安装节）
+# 注：右列 models 取自平台说明而非手写字面量，这是**跨文档引用完整性**的固有形状，
+# 不是镜像断言——两侧出自不同文档，一侧漂移另一侧未跟即红，正是它要抓的那次断裂。
+# （镜像断言指两侧同源、恒真；此处硬钉型号反而会在仓外另立一处权威。）
 codex_note = "\n".join(t for _, t in notes.get("Codex", []))
 guides = [p for p in ROOT.rglob("*.md")
           if ".git" not in p.parts and p.name not in ("README.md", "README.en.md")
@@ -139,10 +217,12 @@ else:
     missing = [m for m in models if m not in guide_text]
     check("T9 指引声明平台说明所钉全部型号", not missing, f"指引未声明 {missing}")
 
-# T11 教条指针：抽离了平台执行细节的教条正文须以指针引用平台执行说明，且指针有真实落点
-check("T11 implement 指针指向真实平台执行说明",
-      "平台执行说明" in read(SKILLS_DIR / "implement/SKILL.md") and bool(notes.get("Claude Code")),
-      "缺指针字样，或指针无落点（Claude 侧说明不存在）")
+# T11 教条指针：抽离了平台执行细节的教条正文须以指针引用平台执行说明，且指针有真实落点。
+# 「正文须含指针字样」是词法契约，含词即正确量具；「落点存在」则逐平台断言，不只验一侧。
+_has_pointer = "平台执行说明" in read(SKILLS_DIR / "implement/SKILL.md")
+_empty = sorted(plat for plat, found in notes.items() if not found)
+check("T11 implement 正文携带平台执行说明指针", _has_pointer, "教条正文缺指针字样")
+check("T11 指针落点双平台齐备", not _empty, f"以下平台无说明可指：{_empty}")
 
 # T12 收敛阀阈值复述（README「节奏·回路收敛阀」的显式例外条款）：
 # 例外范围恰为枚举五相（契约回踢类），各处数值与 README 一致；枚举外教条不得携带同款复述。
