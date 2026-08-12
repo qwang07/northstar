@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SKILLS_DIR = ROOT / "plugins/northstar/skills"
 
-SKILLS = {"brainstorming", "write-test", "audit", "implement", "simplify", "diagnose", "code-review", "deliver"}
+SKILLS = {"brainstorming", "write-test", "audit", "implement", "simplify", "diagnose", "code-review", "deliver", "discover"}
 
 # 声明式约束（绑定层删除后的单源）：哪些相派发、各自工具面与推理档位
 # —— 权威见各 SKILL.md 的「派发声明」，本表是其可机械断言的投影
@@ -48,9 +48,9 @@ def read(p):
     return p.read_text(encoding="utf-8") if p.exists() else ""
 
 
-# T1 教条层：八 skill 目录各含 SKILL.md（拓扑·教条层）
+# T1 教条层：九 skill 目录各含 SKILL.md（拓扑·教条层）
 found_skills = {p.parent.name for p in SKILLS_DIR.glob("*/SKILL.md")}
-check("T1 教条层八 SKILL.md 齐备", found_skills == SKILLS,
+check("T1 教条层九 SKILL.md 齐备", found_skills == SKILLS,
       f"实际 {sorted(found_skills)} ≠ 声明 {sorted(SKILLS)}")
 
 # T2 绑定层无 agent 定义文件（拓扑·绑定层「不设 agent 定义文件」）——断言不存在，防复活

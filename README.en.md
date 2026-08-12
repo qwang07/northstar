@@ -6,7 +6,7 @@
 
 A Claude Code plugin, catalogued and distributed via the [qwang07/plugins](https://github.com/qwang07/plugins) marketplace. **The README is the single, timeless source of target-state truth; tests are its executable projection; history is traceable but never authoritative.**
 
-This framework concentrates all firepower on one thing: **declaring the requester's intent completely in the README** (rationale: see "Design philosophy · Two bottlenecks collapse into one"). The loop is split by **activity**: contract dialogue (brainstorming) → derive guards (write-test) → independent review (audit) → turn red green (implement) → the wrap-up chain (simplify → code-review); defects enter through the diagnose attribution gate; `deliver` is triggered independently and verifies the change actually took effect on the requester's side. **All eight skills are self-authored with zero external plugin dependencies (no superpowers or any other engine); it runs standalone once installed. No executor definitions ship with it** — each phase declares its tool face and reasoning tier in the dogma, and the platform execution note translates those into dispatch parameters. Not every phase dispatches: brainstorming and write-test are human dialogue and in-place derivation, run in the main session.
+This framework concentrates all firepower on one thing: **declaring the requester's intent completely in the README** (rationale: see "Design philosophy · Two bottlenecks collapse into one"). The loop is split by **activity**: goal discovery (discover, skippable) → contract dialogue (brainstorming) → derive guards (write-test) → independent review (audit) → turn red green (implement) → the wrap-up chain (simplify → code-review); defects enter through the diagnose attribution gate; `deliver` is triggered independently and verifies the change actually took effect on the requester's side. **All nine skills are self-authored with zero external plugin dependencies (no superpowers or any other engine); it runs standalone once installed. No executor definitions ship with it** — each phase declares its tool face and reasoning tier in the dogma, and the platform execution note translates those into dispatch parameters. Not every phase dispatches: brainstorming and write-test are human dialogue and in-place derivation, run in the main session.
 
 ## Install
 
@@ -15,7 +15,7 @@ This framework concentrates all firepower on one thing: **declaring the requeste
 /plugin install northstar@qwang07
 ```
 
-After install, the eight skills appear namespaced: `northstar:brainstorming` / `:write-test` / `:audit` / `:implement` / `:simplify` / `:diagnose` / `:code-review` / `:deliver`. **No executor definitions are shipped** — each phase declares its tool face and reasoning tier in the dogma; the platform execution note translates them into this platform's dispatch parameters (see Cross-platform topology).
+After install, the nine skills appear namespaced: `northstar:discover` / `:brainstorming` / `:write-test` / `:audit` / `:implement` / `:simplify` / `:diagnose` / `:code-review` / `:deliver`. **No executor definitions are shipped** — each phase declares its tool face and reasoning tier in the dogma; the platform execution note translates them into this platform's dispatch parameters (see Cross-platform topology).
 
 Codex CLI side: skills install via the same marketplace catalog; platform prerequisites (the multi-agent switch) and the tier→model table live in `docs/codex-install.md`.
 
@@ -26,6 +26,7 @@ northstar/
 ├── plugins/northstar/
 │   ├── .claude-plugin/plugin.json      manifest
 │   └── skills/
+│       ├── discover/SKILL.md           goal discovery: the divergent phase — is this goal even right? (skippable)
 │       ├── brainstorming/SKILL.md      contract phase: dialogue into README (sole write entry, clauses land at their authoritative layer)
 │       ├── write-test/SKILL.md         test phase: derive tests or a verification checklist from the README
 │       ├── audit/SKILL.md              independent review: zero-context audit (two checkpoints)
@@ -46,14 +47,15 @@ northstar/
 ```
 (delivery) ─▶ deliver ── human gate ──▶ verify from the consumer side (independent entry, on no loop node)
 (defect) ──▶ diagnose ── attribute & route ─▶┐
-(new need) ─────────────────────────────────▶ brainstorming ──▶ write-test ──▶ audit ──▶ human gate ──▶ implement ──▶ wrap-up chain
-                                              (contract·README)  (tests/checklist) (zero-context)        (red→green)  simplify → code-review
-                                                 ▲     ▲               ▲                                     │      (no authoring memory) (zero-context)
-                                                 │     └─ contract-gap kickback ┴─ test-gap / simplify-turned-red ◀───┴──── finding kickback ◀┘
-                                                 └──────────── close-out (project exit gate) ◀── wrap-up chain done · all modules done
+(new need) ─▶ discover ─ goal confirmed ─▶ brainstorming ──▶ write-test ──▶ audit ──▶ human gate ──▶ implement ──▶ wrap-up chain
+               (divergent, skippable)       (contract·README)  (tests/checklist) (zero-context)        (red→green)  simplify → code-review
+                                               ▲     ▲               ▲                                     │      (no authoring memory) (zero-context)
+                                               │     └─ contract-gap kickback ┴─ test-gap / simplify-turned-red ◀───┴──── finding kickback ◀┘
+                                               └──────────── close-out (project exit gate) ◀── wrap-up chain done · all modules done
 ```
 
 - **The split axis is activity; the round is defined by its goal**: contract dialogue / test writing / review / implementation each own a phase. Contract clauses land at their authoritative layer — project-level (topology and boundaries) / cross-cutting layer (constraints shared by multiple modules, existing on demand) / module-level (internal behavior); altitude is a landing result, not an entry parameter.
+- **Goal discovery comes first**: a new need passes through `discover` — is the goal itself right? (goal alignment / prioritisation / feasibility probes / technology selection) — before entering the contract phase; goals that are clear and low-risk skip it and go straight to brainstorming. It is the **opposite discipline** to the contract phase (divergent vs convergent), hence its own phase — rationale in "Design philosophy · Divergence and convergence must be separated".
 - **Granularity valve**: if this round's goal requires expanding the internal contracts of more than one module → the round stops at decomposition (sub-goal list + project-level / cross-cutting clauses); each sub-goal becomes its own later round of `brainstorming → write-test → audit → implement → wrap-up chain`.
 - **Round start & solidification**: whichever phase opens the round (brainstorming kickoff / a small pure-implementation change entering implement directly / a defect admitted via diagnose) records the **start point** on entry (process-state, routed out); implement's exit **solidifies this round's changes into a baseline point** (means delivered by the platform execution note — the dogma names no tool). Throughout the loop, "this round's diff" is always start point → solidified point — audit's attribution and both wrap-up passes consume it.
 - **Test-free branch**: pure one-off operations (migrations / backfills / one-shot scripts) get no derived tests; write-test instead produces a **mechanically decidable verification checklist**, audited alongside the README; implement's completion criterion is passing the checklist item by item.
@@ -63,12 +65,13 @@ northstar/
 - **Close-out**: all modules done (each with its wrap-up chain complete) → return to brainstorming to close out — architecture structure tests all green + a re-run of the business-flow walkthrough + standing-debt settlement (every standing-debt report audit ever routed out is checked off: handled, or explicitly recorded as accepted by a human) = the project-level exit gate (loop terminal).
 - **Loop convergence valve**: any back-edge retriggering on the **same gap** up to a threshold (default 3) without converging → BLOCKED: stop auto-kickback, escalate to a human, attach that gap's kickback history (process-state routed out, never into the contract).
   **The round / standing-debt split belongs to audit alone**: only its verdict is two-tier, so only gaps introduced by the current round are counted (attribution criterion in `audit`'s verdict section). Every other phase's valve follows the general rule above and makes **no** round / standing distinction — their back-edges produce no standing-debt report.
-  The threshold is **deliberately restated** in six dogma files: brainstorming · write-test · audit · implement · code-review · deliver. Rationale: dogma is not re-read after loading and cross-file jumps often fail to happen late in a long loop, so this is an **explicit exception to "one authoritative statement + pointers", and the exception is exactly that enumeration**; a structure test must assert **the enumerated set is complete and all values identical** (a missing copy or a differing value is red). diagnose carries two valves of its own (defect-fix rounds / evidence stalling) and is not in this set.
+  The threshold is **deliberately restated** in six dogma files: brainstorming · write-test · audit · implement · code-review · deliver. Rationale: dogma is not re-read after loading and cross-file jumps often fail to happen late in a long loop, so this is an **explicit exception to "one authoritative statement + pointers", and the exception is exactly that enumeration**; a structure test must assert **the enumerated set is complete and all values identical** (a missing copy or a differing value is red). diagnose (defect-fix rounds / evidence stalling) and discover (probe stalling) carry valves of their own on independent terms and are not in this set.
 
 ## Usage
 
 Advance one scope at a time; describe your intent in chat to trigger the matching skill:
 
+- **A new idea / should we even do this**: start with `discover` — goal alignment, prioritisation, selection validated by probe; "don't do it" is a legitimate conclusion. Tasks whose goal is already clear skip it.
 - **New project**: `brainstorming` (a cross-module goal) designs the topology (module list + dependencies + interface contracts), gated by `audit`, then per module `brainstorming → write-test → audit → implement → wrap-up chain`; when all are done, `brainstorming` closes out.
 - **Existing project**: `brainstorming` first distills the existing structure and asks whether to adjust; once the target state is set, proceed as above.
 - **Bug fix**: an unexplained red or production defect first enters `diagnose` for attribution, then routes by exit (implementation wrong → implement; contract gap → brainstorming; test wrong / weak assertion → write-test).
@@ -77,10 +80,11 @@ Advance one scope at a time; describe your intent in chat to trigger the matchin
 
 Division of labor: in the contract and test phases, **the human** interrogates the requester's intent to completeness and confirms the contract; **the skills** turn the contract into guards and the red green. In one line — **the human defines the contract, the AI turns red to green.**
 
-## The eight skills
+## The nine skills
 
 | skill | phase | responsibility | output |
 |---|---|---|---|
+| `discover` | goal discovery · divergent phase (skippable) | four things: goal alignment (the stated goal is usually just a candidate means) · prioritisation · feasibility probes (small and reversible) · technology selection (validate irreversible decisions before committing); runs in the main session, dispatches nothing | a confirmed goal statement (what to achieve / what counts as achieved) + selection conclusions + rejected alternatives with reasons (routed out); or a "don't do it / defer" close |
 | `brainstorming` | contract · sole README write entry | open with the goal, interrogate intent to completeness (one question at a time); distill existing code before asking to adjust; business-flow walkthrough before finalizing; close out when all modules are done | README clauses landed by goal: project-level (module list + topology [each edge carries an interface contract] + boundary interfaces, **no internals**) / cross-cutting layer (constraints shared by multiple modules, on demand) / module-level (responsibility & boundary / expected features / interface contract / edge cases & invariants, **internals only**) |
 | `write-test` | test · derivation | branch decision (needs lasting guarding → tests; one-off → verification checklist); test intent, not implementation; strong-assertion discipline | standalone test files (initially red: business-intent tests + structure tests [modules exist / interfaces visible / lasting invariants]) or a mechanically decidable checklist |
 | `audit` | review · independent | **zero-context (hard requirement, must dispatch a subagent)** review of design artifacts; two checkpoints; gaps routed back upstream | **Two-tier verdict**: round verdict (did this round's changes introduce new incoherence — the release criterion) + standing-debt report (pre-existing debt; routed out, does not block handoff). Five checks: completeness · contract↔test consistency · boundary hygiene · internal consistency · **assertion strength** |
@@ -93,6 +97,7 @@ Division of labor: in the contract and test phases, **the human** interrogates t
 ## Design philosophy (core axioms)
 
 - **Two bottlenecks collapse into one**: AI implementation is production-ready; the real problems are ① system design ② test completeness, both equivalent to "declaring intent completely in the README." All skill firepower goes here.
+- **Divergence and convergence must be separated**: goal discovery has to spread possibilities out (suspending judgement); contract dialogue has to interrogate and settle (removing ambiguity). The two disciplines are opposites, and in one phase convergence inevitably contaminates divergence — before you have finished exploring, the pressure to "settle the contract" is already filtering. Hence discover is its own phase; one extra phase switch is the cheaper price.
 - **Split by activity, the goal defines the round**: contract dialogue, test writing, review, and implementation are four activities, each owning a phase; the round is defined by its goal (what to achieve, what counts as achieved), and project-level / cross-cutting / module-level are merely the layers where clauses land. One activity is never split into two skills by altitude — that breeds the mirror tax.
 - **Sole README write entry**: only brainstorming may write READMEs; **every other phase is read-only**, kicking gaps back. Companion rule: one authoritative statement + pointers, no restating across READMEs (the sole exception, and how it is guarded, lives in the Rhythm section's convergence-valve entry).
 - **Temporal-semantics layering**: target-state (README + tests, bounded, sole truth) vs process-state (git log / GitHub Issues / memory tools, monotonically growing, traceable but not authoritative).
@@ -113,7 +118,7 @@ Division of labor: in the contract and test phases, **the human** interrogates t
 northstar ships for two platforms, Claude Code and Codex CLI. Three layers, connected by interface contracts:
 
 ```
-Dogma layer    plugins/northstar/skills/ eight SKILL.md — single source, platform-agnostic
+Dogma layer    plugins/northstar/skills/ nine SKILL.md — single source, platform-agnostic
    ▲ via the I-platform-capability table
 Binding layer  One platform execution note per platform (skills/implement/references/platform-*.md) — the sole carrier
                translates the dogma's declarative constraints (tool face / reasoning tier) into this platform's dispatch parameters
@@ -141,14 +146,14 @@ Binding layer = the **platform execution note** (one per platform, sole carrier:
 
 ## Plugin boundary: dogma + execution bindings (three hard subagent dependencies)
 
-The plugin = eight skills (dogma, tool-agnostic) + two platform execution notes (the binding layer: translating declarative constraints into dispatch parameters — see the Cross-platform topology section). **No agent definition files at all**: each phase declares its executor's tool face and reasoning tier in the dogma, and the persona is composed on the spot by the dispatcher. **Three hard platform dependencies** (all native capabilities, but dependencies nonetheless): `audit` and `code-review` must dispatch a **zero-context subagent** (the in-session agent remembers the design conversation and can't be truly zero-context); `simplify` must dispatch a **zero-authoring-memory executor** (the in-session agent remembers how the code came to be, so simplifying it yourself is playing amnesiac). The distinction between the two is in the Design philosophy entry of the same name. When the environment can't dispatch one, that step is not executable — BLOCKED to a human, never downgraded to self-review. Everything else below stays **out of the plugin** and is the user's personal global CLAUDE.md workflow config:
+The plugin = nine skills (dogma, tool-agnostic) + two platform execution notes (the binding layer: translating declarative constraints into dispatch parameters — see the Cross-platform topology section). **No agent definition files at all**: each phase declares its executor's tool face and reasoning tier in the dogma, and the persona is composed on the spot by the dispatcher. **Three hard platform dependencies** (all native capabilities, but dependencies nonetheless): `audit` and `code-review` must dispatch a **zero-context subagent** (the in-session agent remembers the design conversation and can't be truly zero-context); `simplify` must dispatch a **zero-authoring-memory executor** (the in-session agent remembers how the code came to be, so simplifying it yourself is playing amnesiac). The distinction between the two is in the Design philosophy entry of the same name. When the environment can't dispatch one, that step is not executable — BLOCKED to a human, never downgraded to self-review. Everything else below stays **out of the plugin** and is the user's personal global CLAUDE.md workflow config:
 
 - **Process-state routing** (where rationale / todos / history go): bind memory tools / GitHub Issues / git. Skills only declare "process-state stays out of the contract, routed out," not where to.
 - **Contract-conformance review** (does the implementation exactly == the contract) is the opposite — it's framework dogma, self-issued by `implement`'s exit gate, not outsourced.
 
 ## Independence: self-contained, no external engine
 
-All eight skills are self-authored, **depending on / reusing / pinning no external plugin** (including superpowers and other official engines; `simplify`'s simplification discipline was digested from the official code-simplifier and re-authored, with a source line kept in its SKILL.md). northstar runs standalone once installed.
+All nine skills are self-authored, **depending on / reusing / pinning no external plugin** (including superpowers and other official engines; `simplify`'s simplification discipline was digested from the official code-simplifier and re-authored, with a source line kept in its SKILL.md). northstar runs standalone once installed.
 
 **Why no external engine**: borrowing an off-the-shelf TDD / review engine was considered and dropped after a fit assessment — "don't reinvent the wheel" holds only when it's "redundant and unnecessary," and northstar needs things an external engine can't give:
 
