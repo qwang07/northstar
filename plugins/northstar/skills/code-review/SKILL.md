@@ -25,7 +25,7 @@ description: "在 implement 令测试全绿、simplify 精简之后、合并之�
 ## northstar 不变量
 1. **发现只读**：评审发现对 implement 循环只读——按边界二处理（满足它，或判定为契约缺陷而回踢 brainstorming 补契约），**不得软化、不得预判**。
 2. **不建议镀金**：禁止建议模块 README 未声明的功能/灵活性（"不声明就不做"）。
-3. **过程态出境**：评审记录进 git / GitHub Issues，不入 README。
+3. **过程态出境**：评审记录出境（去向交工作流，不由本教条声明），不入 README。
 
 ## 严重度与裁决
 Critical（bug / 数据丢失 / 静默失败）/ Important（错误处理、可维护性硬伤）/ Minor（风格、优化）。每条带 `file:line` + 错在哪 + 为何要紧 + 怎么修。末尾给明确裁决：**可收尾 / 需修后收尾**，不含糊。
@@ -38,7 +38,9 @@ Critical（bug / 数据丢失 / 静默失败）/ Important（错误处理、可�
 4. **禁表演性同意**：不写"你说得对 / 好发现"，直接陈述技术判断或直接动手——代码本身就是回应。评审建议"补全 / 做完整"时先查实际用量：无人使用 → 按不镀金原则拒绝；确有真实用量 → 那是"该写没写"的契约缺口，走第 2 岔回踢补契约后再做，不直接实现。
 
 ## 退出
-Critical、Important 已满足或已回踢上游 → **收尾链结束**。回到模块循环取下一个未完成模块，或全部模块完成则触发 brainstorming 收口（项目级退出门）。
+Critical、Important 已满足或已回踢上游 → **收尾链结束**，回到模块循环取下一个未完成模块（收口触发条件见 brainstorming 的「收口」节，此处不复述）。
+
+**收敛阀**：同一发现回踢上游达阈值（默认 3 次）仍不收敛 → BLOCKED 升级给人，附回踢历史（过程态出境）。
 
 ---
 来源：吸收自 superpowers `requesting-code-review` 6.0.3（检查清单 / Read-Only 纪律 / 严重度三档）+ `receiving-code-review` 6.1.1（发现处置：复核先于动手 / 三岔 / 禁表演性同意）+ `pr-review-toolkit:silent-failure-hunter`（错误路径棱镜）；自著适配为 northstar 嗓音，非 vendor。
