@@ -4,7 +4,7 @@
 
 一个 Claude Code plugin，经 [qwang07/plugins](https://github.com/qwang07/plugins) marketplace 编目分发。**README 是唯一的、无时间的目标态真理；测试是其可执行投影；历史可追溯不可权威。**
 
-本框架把火力全部砸在一件事上：**把需求者意图在 README 里声明完整**（理由见「设计理念·两瓶颈坍缩为一」）。回路按**活动**切分：契约对话（brainstorming）→ 派生守护物（write-test）→ 独立评审（audit）→ 令红变绿（implement）→ 收尾链（simplify 精简 → code-review 质量刀）；缺陷经 diagnose 归因入口进入。**七个 skill 全自著、零外部 plugin 依赖（不挂 superpowers 等任何引擎），装上即独立运行；不预置执行者定义——工具面与推理档位由各相在教条内声明，派发时按平台执行说明翻译。**并非每相都派子代理：brainstorming 与 write-test 是人机对话与就地派生，在主会话执行。
+本框架把火力全部砸在一件事上：**把需求者意图在 README 里声明完整**（理由见「设计理念·两瓶颈坍缩为一」）。回路按**活动**切分：契约对话（brainstorming）→ 派生守护物（write-test）→ 独立评审（audit）→ 令红变绿（implement）→ 收尾链（simplify 精简 → code-review 质量刀）；缺陷经 diagnose 归因入口进入；`deliver` 独立触发，核验改动在需求者那里真的生效。**八个 skill 全自著、零外部 plugin 依赖（不挂 superpowers 等任何引擎），装上即独立运行；不预置执行者定义——工具面与推理档位由各相在教条内声明，派发时按平台执行说明翻译。**并非每相都派子代理：brainstorming 与 write-test 是人机对话与就地派生，在主会话执行。
 
 ## 安装
 
@@ -13,7 +13,7 @@
 /plugin install northstar@qwang07
 ```
 
-安装后七个 skill 以命名空间出现：`northstar:brainstorming` / `:write-test` / `:audit` / `:implement` / `:simplify` / `:diagnose` / `:code-review`。**不预置任何执行者定义**——各相在教条内声明工具面与推理档位，派发时由平台执行说明翻译为本平台调用参数（见「跨平台拓扑」节）。
+安装后八个 skill 以命名空间出现：`northstar:brainstorming` / `:write-test` / `:audit` / `:implement` / `:simplify` / `:diagnose` / `:code-review` / `:deliver`。**不预置任何执行者定义**——各相在教条内声明工具面与推理档位，派发时由平台执行说明翻译为本平台调用参数（见「跨平台拓扑」节）。
 
 Codex CLI 侧：skills 经同一 marketplace 编目安装；平台前置（多代理开关）与档位型号表见 `docs/codex-install.md`。
 
@@ -31,7 +31,8 @@ northstar/
 │       ├── implement/references/       绑定层：双平台执行说明（声明式约束 → 调用参数）
 │       ├── simplify/SKILL.md           收尾链首道：零写码记忆地精简本轮改动
 │       ├── diagnose/SKILL.md           缺陷入口：归因先于修复，出口分流回路
-│       └── code-review/SKILL.md        收尾链末道：零上下文审代码质量
+│       ├── code-review/SKILL.md        收尾链末道：零上下文审代码质量
+│       └── deliver/SKILL.md            交付入口：核验改动在需求者那里真的生效
 ├── docs/codex-install.md               Codex 前置配置（多代理开关 + 档位型号表）
 ├── tests/structure.py                  项目级结构测试（拓扑形状 / 绑定分级 / 禁词不变量 / 引用完整性）
 ├── README.md
@@ -41,6 +42,7 @@ northstar/
 ## 节奏
 
 ```
+（交付）──▶ deliver ── 人 Gate ──▶ 消费端取证（独立入口，不挂回路节点）
 （缺陷）──▶ diagnose ──归因分流──▶┐
 （新需求）──────────────────────▶ brainstorming ──▶ write-test ──▶ audit ──▶ 人 Gate ──▶ implement ──▶ 收尾链
                                  (契约相·README)   (测试 / 清单)  (零上下文)              (红变绿)   simplify → code-review
@@ -55,10 +57,11 @@ northstar/
 - **免测试分支**：纯一次性操作（迁移 / 灌数 / 一次性脚本）不派生测试，由 write-test 改产**机械可判定的验证清单**，同交 audit 审；implement 以清单逐项过为完成判据。
 - **audit 双检查点**：brainstorming 定稿后（跨模块目标契约先审，省派生返工）+ write-test 完成后（README + 测试 / 清单合卷）；单模块目标可并为一次合卷审。
 - **收尾链**：implement 退出门过后**必经**两道工序——`simplify`（零写码记忆地精简本轮改动，只改写法不改行为）→ `code-review`（零上下文质量刀）。两者均**硬性派子代理**，环境不支持即 BLOCKED（理由见「plugin 边界」节的三处硬性依赖）。simplify 的适用范围**按代码判而非按分支判**——判据与整体跳过的条件均见 `simplify` 的「适用范围」节，此处不复述。
+- **交付独立触发**：`deliver` 不挂任何回路节点——交付频率与回路节奏天然不对齐（一次交付可含多轮实施）。前置只有一条：本轮实施与收尾链已走完。回路终点由此从"代码正确"延至"**改动生效**"；运行期（可观测性 / 事故响应 / 回滚编排）不纳入，属运行期工具的地盘。
 - **收口**：全部模块完成（含各自收尾链走完）→ 回到 brainstorming 收口——架构结构测试全绿 + 业务流走查复跑 + 存量债清账（audit 历轮出境的存量报告逐条已处置或经人显式记录为接受）= 项目级退出门（loop 终态）。
 - **回路收敛阀**：任一回边对**同一缺口**反复触发达阈值（默认 3 次）仍不收敛 → BLOCKED，停自动回踢、升级给人决策，附该缺口回踢历史（过程态出境，不入契约）。
   **本轮 / 存量之分只属 audit**：唯它的判决分两级，故只计本轮引入的缺口（归属判据见 `audit` 判决节）。其余各相的阀按本条通则计，**不做**本轮 / 存量之分——它们的回边不产生存量报告。
-  该阈值**刻意复述**于五处教条：brainstorming · write-test · audit · implement · code-review。理由是教条载入后不重读、跨文跳转在长回路后期常不发生，故这是「一处权威 + 指针」的**显式例外，且例外范围就是这份枚举**；结构测试须断言**该枚举集合齐全、且各处数值一致**（缺一处或数值不一皆红）。diagnose 另有两条口径独立的阀（缺陷修复轮次 / 取证空耗），不属此列。
+  该阈值**刻意复述**于六处教条：brainstorming · write-test · audit · implement · code-review · deliver。理由是教条载入后不重读、跨文跳转在长回路后期常不发生，故这是「一处权威 + 指针」的**显式例外，且例外范围就是这份枚举**；结构测试须断言**该枚举集合齐全、且各处数值一致**（缺一处或数值不一皆红）。diagnose 另有两条口径独立的阀（缺陷修复轮次 / 取证空耗），不属此列。
 
 ## 用法
 
@@ -68,10 +71,11 @@ northstar/
 - **已有项目**：`brainstorming` 先蒸馏现有结构、问你是否调整，确立目标态后同上。
 - **改 bug**：红因不明 / 生产缺陷先进 `diagnose` 归因，按出口分流（实现错 → implement；契约缺口 → brainstorming；测试错 / 断言弱 → write-test）。
 - **小改动**：纯实现的小改直接 `implement` 会话内直改；触及契约的，先回 `brainstorming` 改 README、`write-test` 改测试，再实现。**规模只决定 implement 的执行形态，不豁免收尾链**——小改动同样走 simplify → code-review。
+- **发版 / 交付**：口头触发 `deliver`——它核验改动在**需求者那里**真的生效（从消费端取证、锚定版本），不可逆动作前过人 Gate。任何时候都可触发，不必等回路走到某处。
 
 分工：契约与测试阶段，**人**把需求者意图逼问完整、确认契约；**skill** 把契约落成守护物、把红改绿。一句话——**契约由人定，红变绿由 AI 做。**
 
-## 七个 skill
+## 八个 skill
 
 | skill | 相 | 职责 | 产物 |
 |---|---|---|---|
@@ -82,6 +86,7 @@ northstar/
 | `simplify` | 收尾链·首道 | **零写码记忆**地精简本轮改动：只改写法不改行为，一处一改保持全绿；与 implement 内循环重构以**粒度 + 独立性**双判据划界 | 精简后代码 + 精简点清单 + **两类报告项**：① 致红回踢项 → write-test（须先自证行为等价；自证不出即判改动错、撤销结案，**不产生回踢项**）② 疑似 bug / 契约缺口（只报不动手，交派发者三岔处置） |
 | `diagnose` | 缺陷入口 | 归因先于修复；取证→模式对照→假设检验→分流 | 复现红测试（→implement）/ 契约缺口（→brainstorming）/ 修测清单（→write-test）/ 外部问题留档 |
 | `code-review` | 收尾链·末道 | 零上下文审代码质量（潜在 bug / 静默失败 / 可维护性），锚定模块 README 为规格；发现处置：复核→满足 / 回踢 / 有据驳回 | 严重度分档发现 + 明确裁决（可收尾 / 需修后收尾） |
+| `deliver` | 交付·独立入口 | 核验交付物 = 契约声明；三标准（交付形态入契约 / 从消费端取证不从生产端 / 一致性锚定版本）+ 三纪律（不可逆动作过人 Gate / 验证在发布之后 / 交付契约是持续契约）；主会话执行不派子代理 | 交付达成判决 + 消费端取证记录（含版本锚）；或契约缺口回踢 / 归因分流 |
 
 ## 设计理念（核心公理）
 
@@ -106,7 +111,7 @@ northstar/
 northstar 面向 Claude Code 与 Codex CLI 双平台分发。三层结构，层间以接口契约相连：
 
 ```
-教条层    plugins/northstar/skills/ 七 SKILL.md —— 单源，平台无关
+教条层    plugins/northstar/skills/ 八 SKILL.md —— 单源，平台无关
    ▲ 经 I-平台能力表
 绑定层    双平台各一份平台执行说明（skills/implement/references/platform-*.md）——唯一载体
           把教条的声明式约束（工具面 / 推理档位）翻译为本平台的派发调用参数
@@ -134,14 +139,14 @@ northstar 面向 Claude Code 与 Codex CLI 双平台分发。三层结构，层�
 
 ## plugin 边界：教条 + 执行绑定（三处硬性子代理依赖）
 
-本 plugin = 七个 skill（教条，工具无关）+ 两份平台执行说明（绑定层：把声明式约束翻译为调用参数——见「跨平台拓扑」节）。**不含任何 agent 定义文件**：执行者的工具面与推理档位由各相在教条内声明，人格由派发者按教条现场组装。**三处硬性平台依赖**（皆为平台原生能力，但仍是依赖）：`audit` 与 `code-review` 必须派**零上下文子代理**（同 session 当前 agent 记得设计对话，无法真零上下文）；`simplify` 必须派**零写码记忆的独立执行者**（当前 agent 记得实施过程，自己精简即假装失忆）。两种独立性的分别见「设计理念」同名条。环境无法派子代理时对应环节不可执行，BLOCKED 升级给人，不得降级自审。除此之外，以下一律**不进 plugin**，是使用者个人全局 CLAUDE.md 的工作流配置：
+本 plugin = 八个 skill（教条，工具无关）+ 两份平台执行说明（绑定层：把声明式约束翻译为调用参数——见「跨平台拓扑」节）。**不含任何 agent 定义文件**：执行者的工具面与推理档位由各相在教条内声明，人格由派发者按教条现场组装。**三处硬性平台依赖**（皆为平台原生能力，但仍是依赖）：`audit` 与 `code-review` 必须派**零上下文子代理**（同 session 当前 agent 记得设计对话，无法真零上下文）；`simplify` 必须派**零写码记忆的独立执行者**（当前 agent 记得实施过程，自己精简即假装失忆）。两种独立性的分别见「设计理念」同名条。环境无法派子代理时对应环节不可执行，BLOCKED 升级给人，不得降级自审。除此之外，以下一律**不进 plugin**，是使用者个人全局 CLAUDE.md 的工作流配置：
 
 - **过程态路由**（决策理由、待办、历史去哪）：绑记忆工具 / GitHub Issues / git。skill 只声明"过程态不入契约、路由出境"，不声明去向。
 - **契约合规评审**（实现是否恰好 = 契约）则相反——它是本框架 dogma，由 `implement` 退出门自出，不外包。
 
 ## 独立性：自成一体，不挂外部引擎
 
-七个 skill 全自著，**不依赖、不复用、不 pin 任何外部 plugin**（含 superpowers 等官方引擎；`simplify` 的精简纪律消化自官方 code-simplifier 后自著，来源行留于其 SKILL.md）。northstar 装上即可独立运行。
+八个 skill 全自著，**不依赖、不复用、不 pin 任何外部 plugin**（含 superpowers 等官方引擎；`simplify` 的精简纪律消化自官方 code-simplifier 后自著，来源行留于其 SKILL.md）。northstar 装上即可独立运行。
 
 **为什么不挂任何外部引擎**：曾考虑借现成 TDD / 评审引擎，逐个评估契合度后放弃——"不造轮子"仅在"重复且无必要"时成立，而 northstar 有外部引擎给不了的东西：
 

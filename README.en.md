@@ -6,7 +6,7 @@
 
 A Claude Code plugin, catalogued and distributed via the [qwang07/plugins](https://github.com/qwang07/plugins) marketplace. **The README is the single, timeless source of target-state truth; tests are its executable projection; history is traceable but never authoritative.**
 
-This framework concentrates all firepower on one thing: **declaring the requester's intent completely in the README** (rationale: see "Design philosophy · Two bottlenecks collapse into one"). The loop is split by **activity**: contract dialogue (brainstorming) → derive guards (write-test) → independent review (audit) → turn red green (implement) → the wrap-up chain (simplify → code-review); defects enter through the diagnose attribution gate. **All seven skills are self-authored with zero external plugin dependencies (no superpowers or any other engine); it runs standalone once installed. No executor definitions ship with it** — each phase declares its tool face and reasoning tier in the dogma, and the platform execution note translates those into dispatch parameters. Not every phase dispatches: brainstorming and write-test are human dialogue and in-place derivation, run in the main session.
+This framework concentrates all firepower on one thing: **declaring the requester's intent completely in the README** (rationale: see "Design philosophy · Two bottlenecks collapse into one"). The loop is split by **activity**: contract dialogue (brainstorming) → derive guards (write-test) → independent review (audit) → turn red green (implement) → the wrap-up chain (simplify → code-review); defects enter through the diagnose attribution gate; `deliver` is triggered independently and verifies the change actually took effect on the requester's side. **All eight skills are self-authored with zero external plugin dependencies (no superpowers or any other engine); it runs standalone once installed. No executor definitions ship with it** — each phase declares its tool face and reasoning tier in the dogma, and the platform execution note translates those into dispatch parameters. Not every phase dispatches: brainstorming and write-test are human dialogue and in-place derivation, run in the main session.
 
 ## Install
 
@@ -15,7 +15,7 @@ This framework concentrates all firepower on one thing: **declaring the requeste
 /plugin install northstar@qwang07
 ```
 
-After install, the seven skills appear namespaced: `northstar:brainstorming` / `:write-test` / `:audit` / `:implement` / `:simplify` / `:diagnose` / `:code-review`. **No executor definitions are shipped** — each phase declares its tool face and reasoning tier in the dogma; the platform execution note translates them into this platform's dispatch parameters (see Cross-platform topology).
+After install, the eight skills appear namespaced: `northstar:brainstorming` / `:write-test` / `:audit` / `:implement` / `:simplify` / `:diagnose` / `:code-review` / `:deliver`. **No executor definitions are shipped** — each phase declares its tool face and reasoning tier in the dogma; the platform execution note translates them into this platform's dispatch parameters (see Cross-platform topology).
 
 Codex CLI side: skills install via the same marketplace catalog; platform prerequisites (the multi-agent switch) and the tier→model table live in `docs/codex-install.md`.
 
@@ -33,7 +33,8 @@ northstar/
 │       ├── implement/references/       binding layer: both platform execution notes (declaration → dispatch parameters)
 │       ├── simplify/SKILL.md           wrap-up chain, first pass: simplify this round's diff with zero authoring memory
 │       ├── diagnose/SKILL.md           defect entry: attribution before any fix, exits routed back into the loop
-│       └── code-review/SKILL.md        wrap-up chain, last pass: zero-context code-quality review
+│       ├── code-review/SKILL.md        wrap-up chain, last pass: zero-context code-quality review
+│       └── deliver/SKILL.md            delivery entry: verify the change really took effect for the requester
 ├── docs/codex-install.md               Codex prerequisites (multi-agent switch + tier→model table)
 ├── tests/structure.py                  project-level structure tests (topology shape / binding tiers / forbidden-word invariant / reference integrity)
 ├── README.md
@@ -43,6 +44,7 @@ northstar/
 ## Rhythm
 
 ```
+(delivery) ─▶ deliver ── human gate ──▶ verify from the consumer side (independent entry, on no loop node)
 (defect) ──▶ diagnose ── attribute & route ─▶┐
 (new need) ─────────────────────────────────▶ brainstorming ──▶ write-test ──▶ audit ──▶ human gate ──▶ implement ──▶ wrap-up chain
                                               (contract·README)  (tests/checklist) (zero-context)        (red→green)  simplify → code-review
@@ -57,10 +59,11 @@ northstar/
 - **Test-free branch**: pure one-off operations (migrations / backfills / one-shot scripts) get no derived tests; write-test instead produces a **mechanically decidable verification checklist**, audited alongside the README; implement's completion criterion is passing the checklist item by item.
 - **Two audit checkpoints**: after brainstorming finalizes the README (cross-module goals: audit the contract first, saving derivation rework) + after write-test completes (README + tests / checklist reviewed together); single-module goals may merge into one combined review.
 - **Wrap-up chain**: once implement's exit gate passes, two passes are **mandatory** — `simplify` (simplify this round's diff with zero authoring memory; wording only, never behavior) → `code-review` (the zero-context quality cut). Both **hard-require dispatching a subagent**; if the environment can't, BLOCKED (rationale: the three hard dependencies in the Plugin boundary section). simplify's scope is decided **per code, not per branch** — both the criterion and the condition for skipping it entirely live in `simplify`'s "scope" section; not restated here.
+- **Delivery is triggered independently**: `deliver` hangs off no loop node — delivery cadence and loop cadence simply don't line up (one delivery may cover several rounds of implementation). Its only precondition: this round's implementation and wrap-up chain are done. The loop's endpoint thereby extends from "the code is correct" to "**the change took effect**"; runtime concerns (observability / incident response / rollback orchestration) stay out — that's runtime tooling's territory.
 - **Close-out**: all modules done (each with its wrap-up chain complete) → return to brainstorming to close out — architecture structure tests all green + a re-run of the business-flow walkthrough + standing-debt settlement (every standing-debt report audit ever routed out is checked off: handled, or explicitly recorded as accepted by a human) = the project-level exit gate (loop terminal).
 - **Loop convergence valve**: any back-edge retriggering on the **same gap** up to a threshold (default 3) without converging → BLOCKED: stop auto-kickback, escalate to a human, attach that gap's kickback history (process-state routed out, never into the contract).
   **The round / standing-debt split belongs to audit alone**: only its verdict is two-tier, so only gaps introduced by the current round are counted (attribution criterion in `audit`'s verdict section). Every other phase's valve follows the general rule above and makes **no** round / standing distinction — their back-edges produce no standing-debt report.
-  The threshold is **deliberately restated** in five dogma files: brainstorming · write-test · audit · implement · code-review. Rationale: dogma is not re-read after loading and cross-file jumps often fail to happen late in a long loop, so this is an **explicit exception to "one authoritative statement + pointers", and the exception is exactly that enumeration**; a structure test must assert **the enumerated set is complete and all values identical** (a missing copy or a differing value is red). diagnose carries two valves of its own (defect-fix rounds / evidence stalling) and is not in this set.
+  The threshold is **deliberately restated** in six dogma files: brainstorming · write-test · audit · implement · code-review · deliver. Rationale: dogma is not re-read after loading and cross-file jumps often fail to happen late in a long loop, so this is an **explicit exception to "one authoritative statement + pointers", and the exception is exactly that enumeration**; a structure test must assert **the enumerated set is complete and all values identical** (a missing copy or a differing value is red). diagnose carries two valves of its own (defect-fix rounds / evidence stalling) and is not in this set.
 
 ## Usage
 
@@ -70,10 +73,11 @@ Advance one scope at a time; describe your intent in chat to trigger the matchin
 - **Existing project**: `brainstorming` first distills the existing structure and asks whether to adjust; once the target state is set, proceed as above.
 - **Bug fix**: an unexplained red or production defect first enters `diagnose` for attribution, then routes by exit (implementation wrong → implement; contract gap → brainstorming; test wrong / weak assertion → write-test).
 - **Small change**: a pure-implementation small change goes straight to `implement` in-session; a change that touches the contract goes back to `brainstorming` for the README and `write-test` for the tests first, then implement. **Scale only picks implement's execution shape; it never exempts the wrap-up chain** — small changes go through simplify → code-review too.
+- **Release / delivery**: say the word to trigger `deliver` — it verifies the change really took effect **on the requester's side** (evidence taken from the consumer side, anchored to a version), with a human gate before anything irreversible. Triggerable at any time; you needn't wait for the loop to reach some point.
 
 Division of labor: in the contract and test phases, **the human** interrogates the requester's intent to completeness and confirms the contract; **the skills** turn the contract into guards and the red green. In one line — **the human defines the contract, the AI turns red to green.**
 
-## The seven skills
+## The eight skills
 
 | skill | phase | responsibility | output |
 |---|---|---|---|
@@ -84,6 +88,7 @@ Division of labor: in the contract and test phases, **the human** interrogates t
 | `simplify` | wrap-up chain · first pass | simplify this round's diff with **zero authoring memory**: wording only, never behavior; one change at a time, staying green; bounded against implement's inner-loop refactor by a **granularity + independence** dual criterion | simplified code + list of simplifications + **two report classes**: ① turned-red kickbacks → write-test (only after proving behavioral equivalence for that change; unprovable ⇒ the change was wrong, revert and close, **no kickback produced**) ② suspected bugs / contract gaps (report only, never touch; dispatcher applies the three-way handling) |
 | `diagnose` | defect entry | attribution before any fix; evidence → pattern comparison → hypothesis testing → routing | reproducing red test (→implement) / contract gap (→brainstorming) / test-fix list (→write-test) / external-issue record |
 | `code-review` | wrap-up chain · last pass | zero-context code-quality review (latent bugs / silent failures / maintainability), anchored to the module README as spec; finding handling: verify → satisfy / kick back / rebut with evidence | severity-ranked findings + explicit verdict (ready to wrap up / fix first) |
+| `deliver` | delivery · independent entry | verify the artifact == what the contract declares; three standards (delivery form is in the contract / take evidence from the consumer side, not the producer side / anchor consistency to a version) + three disciplines (human gate before anything irreversible / verification happens after publishing / the delivery contract is a standing contract); runs in the main session, dispatches nothing | delivery verdict + consumer-side evidence record (with the version anchor); or a contract-gap kickback / attribution routing |
 
 ## Design philosophy (core axioms)
 
@@ -108,7 +113,7 @@ Division of labor: in the contract and test phases, **the human** interrogates t
 northstar ships for two platforms, Claude Code and Codex CLI. Three layers, connected by interface contracts:
 
 ```
-Dogma layer    plugins/northstar/skills/ seven SKILL.md — single source, platform-agnostic
+Dogma layer    plugins/northstar/skills/ eight SKILL.md — single source, platform-agnostic
    ▲ via the I-platform-capability table
 Binding layer  One platform execution note per platform (skills/implement/references/platform-*.md) — the sole carrier
                translates the dogma's declarative constraints (tool face / reasoning tier) into this platform's dispatch parameters
@@ -136,14 +141,14 @@ Binding layer = the **platform execution note** (one per platform, sole carrier:
 
 ## Plugin boundary: dogma + execution bindings (three hard subagent dependencies)
 
-The plugin = seven skills (dogma, tool-agnostic) + two platform execution notes (the binding layer: translating declarative constraints into dispatch parameters — see the Cross-platform topology section). **No agent definition files at all**: each phase declares its executor's tool face and reasoning tier in the dogma, and the persona is composed on the spot by the dispatcher. **Three hard platform dependencies** (all native capabilities, but dependencies nonetheless): `audit` and `code-review` must dispatch a **zero-context subagent** (the in-session agent remembers the design conversation and can't be truly zero-context); `simplify` must dispatch a **zero-authoring-memory executor** (the in-session agent remembers how the code came to be, so simplifying it yourself is playing amnesiac). The distinction between the two is in the Design philosophy entry of the same name. When the environment can't dispatch one, that step is not executable — BLOCKED to a human, never downgraded to self-review. Everything else below stays **out of the plugin** and is the user's personal global CLAUDE.md workflow config:
+The plugin = eight skills (dogma, tool-agnostic) + two platform execution notes (the binding layer: translating declarative constraints into dispatch parameters — see the Cross-platform topology section). **No agent definition files at all**: each phase declares its executor's tool face and reasoning tier in the dogma, and the persona is composed on the spot by the dispatcher. **Three hard platform dependencies** (all native capabilities, but dependencies nonetheless): `audit` and `code-review` must dispatch a **zero-context subagent** (the in-session agent remembers the design conversation and can't be truly zero-context); `simplify` must dispatch a **zero-authoring-memory executor** (the in-session agent remembers how the code came to be, so simplifying it yourself is playing amnesiac). The distinction between the two is in the Design philosophy entry of the same name. When the environment can't dispatch one, that step is not executable — BLOCKED to a human, never downgraded to self-review. Everything else below stays **out of the plugin** and is the user's personal global CLAUDE.md workflow config:
 
 - **Process-state routing** (where rationale / todos / history go): bind memory tools / GitHub Issues / git. Skills only declare "process-state stays out of the contract, routed out," not where to.
 - **Contract-conformance review** (does the implementation exactly == the contract) is the opposite — it's framework dogma, self-issued by `implement`'s exit gate, not outsourced.
 
 ## Independence: self-contained, no external engine
 
-All seven skills are self-authored, **depending on / reusing / pinning no external plugin** (including superpowers and other official engines; `simplify`'s simplification discipline was digested from the official code-simplifier and re-authored, with a source line kept in its SKILL.md). northstar runs standalone once installed.
+All eight skills are self-authored, **depending on / reusing / pinning no external plugin** (including superpowers and other official engines; `simplify`'s simplification discipline was digested from the official code-simplifier and re-authored, with a source line kept in its SKILL.md). northstar runs standalone once installed.
 
 **Why no external engine**: borrowing an off-the-shelf TDD / review engine was considered and dropped after a fit assessment — "don't reinvent the wheel" holds only when it's "redundant and unnecessary," and northstar needs things an external engine can't give:
 

@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SKILLS_DIR = ROOT / "plugins/northstar/skills"
 
-SKILLS = {"brainstorming", "write-test", "audit", "implement", "simplify", "diagnose", "code-review"}
+SKILLS = {"brainstorming", "write-test", "audit", "implement", "simplify", "diagnose", "code-review", "deliver"}
 
 # 声明式约束（绑定层删除后的单源）：哪些相派发、各自工具面与推理档位
 # —— 权威见各 SKILL.md 的「派发声明」，本表是其可机械断言的投影
@@ -48,9 +48,9 @@ def read(p):
     return p.read_text(encoding="utf-8") if p.exists() else ""
 
 
-# T1 教条层：七 skill 目录各含 SKILL.md（拓扑·教条层）
+# T1 教条层：八 skill 目录各含 SKILL.md（拓扑·教条层）
 found_skills = {p.parent.name for p in SKILLS_DIR.glob("*/SKILL.md")}
-check("T1 教条层七 SKILL.md 齐备", found_skills == SKILLS,
+check("T1 教条层八 SKILL.md 齐备", found_skills == SKILLS,
       f"实际 {sorted(found_skills)} ≠ 声明 {sorted(SKILLS)}")
 
 # T2 绑定层无 agent 定义文件（拓扑·绑定层「不设 agent 定义文件」）——断言不存在，防复活
@@ -146,7 +146,7 @@ check("T11 implement 指针指向真实平台执行说明",
 
 # T12 收敛阀阈值复述（README「节奏·回路收敛阀」的显式例外条款）：
 # 例外范围恰为枚举五相（契约回踢类），各处数值与 README 一致；枚举外教条不得携带同款复述。
-VALVE_SET = {"brainstorming", "write-test", "audit", "implement", "code-review"}
+VALVE_SET = {"brainstorming", "write-test", "audit", "implement", "code-review", "deliver"}
 VALVE_PAT = r"阈值（默认 (\d+) 次）"
 readme_vals = set(re.findall(VALVE_PAT, read(ROOT / "README.md")))
 check("T12 README 声明阈值", len(readme_vals) == 1,
