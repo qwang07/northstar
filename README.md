@@ -36,6 +36,7 @@ northstar/
 │       └── deliver/SKILL.md            交付入口：核验改动在需求者那里真的生效
 ├── docs/codex-install.md               Codex 前置配置（多代理开关 + 档位型号表）
 ├── tests/structure.py                  项目级结构测试（拓扑形状 / 绑定分级 / 禁词不变量 / 引用完整性）
+├── tests/pressure/platform-notes.md    兑现类契约的第二层量具：绑定层说明的天真子代理压测规程
 ├── README.md
 └── README.en.md
 ```

@@ -38,6 +38,7 @@ northstar/
 │       └── deliver/SKILL.md            delivery entry: verify the change really took effect for the requester
 ├── docs/codex-install.md               Codex prerequisites (multi-agent switch + tier→model table)
 ├── tests/structure.py                  project-level structure tests (topology shape / binding tiers / forbidden-word invariant / reference integrity)
+├── tests/pressure/platform-notes.md    second measuring layer for delivery-type contracts: naive-subagent pressure test for the binding-layer notes
 ├── README.md
 └── README.en.md
 ```
